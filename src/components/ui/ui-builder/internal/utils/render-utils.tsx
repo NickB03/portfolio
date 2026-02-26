@@ -57,20 +57,20 @@ function isLayerBeingDraggedOrDescendant(
 ): boolean {
   if (!activeLayerId) return false;
   if (layerId === activeLayerId) return true;
-  
+
   // Safety check for pages
   if (!pages || !Array.isArray(pages) || pages.length === 0) return false;
-  
+
   // Check if this layer is a descendant of the dragged layer
   const draggedLayer = findLayerRecursive(pages, activeLayerId);
   if (!draggedLayer) return false;
-  
+
   // Check if this layerId exists within the dragged layer's descendants
   if (hasLayerChildren(draggedLayer)) {
     const foundInDragged = findLayerRecursive([draggedLayer], layerId);
     return !!foundInDragged;
   }
-  
+
   return false;
 }
 
@@ -99,13 +99,23 @@ export const RenderLayer: React.FC<{
     const isLayerAPage = useLayerStore((state) => state.isLayerAPage(layer.id));
     const registry = useEditorStore((state) => state.registry);
     const dndContext = useDndContext();
-    
+
     // Use provided variables or fall back to store variables
     const effectiveVariables = variables || storeVariables;
     const componentDefinition =
       componentRegistry[layer.type as keyof typeof componentRegistry];
 
-    const prevLayer = useRef(layer);
+    const [prevLayer, setPrevLayer] = React.useState(layer);
+    const [layerChanged, setLayerChanged] = React.useState(false);
+
+    React.useEffect(() => {
+      if (!isDeepEqual(prevLayer, layer)) {
+        setPrevLayer(layer);
+        setLayerChanged(true);
+      } else {
+        setLayerChanged(false);
+      }
+    }, [layer, prevLayer]);
 
     const infoData = useMemo(() => ({
       layerType: layer.type,
@@ -116,41 +126,41 @@ export const RenderLayer: React.FC<{
     }), [layer, componentRegistry]);
 
     // Resolve variable references in props with proper memoization
-    const resolvedProps = useMemo(() => 
+    const resolvedProps = useMemo(() =>
       resolveVariableReferences(layer.props, effectiveVariables, variableValues),
       [layer.props, effectiveVariables, variableValues]
     );
-    
+
     // Memoize child editor config to avoid creating objects in JSX
     const childEditorConfig = useMemo(() => {
       return editorConfig
-        ? { ...editorConfig, zIndex: editorConfig.zIndex + 1, parentUpdated: editorConfig.parentUpdated || !isDeepEqual(prevLayer.current, layer) }
+        ? { ...editorConfig, zIndex: editorConfig.zIndex + 1, parentUpdated: editorConfig.parentUpdated || layerChanged }
         : undefined;
-    }, [editorConfig, layer]);
+    }, [editorConfig, layerChanged]);
 
     // Check if this layer is being dragged or is a descendant of a dragged layer
-    const isBeingDragged = useMemo(() => 
+    const isBeingDragged = useMemo(() =>
       isLayerBeingDraggedOrDescendant(layer.id, dndContext.activeLayerId, pages),
       [layer.id, dndContext.activeLayerId, pages]
     );
-    
+
     // Check if this is the root layer being dragged (not a descendant)
     const isRootDraggedLayer = layer.id === dndContext.activeLayerId;
 
     // Check if this layer can accept children and if drag is active (must be before early returns)
     const canAcceptChildren = useMemo(() => canLayerAcceptChildren(layer, registry), [layer, registry]);
-    
+
     // Don't show drop zones inside the layer being dragged or its descendants
-    const showDropZones = useMemo(() => 
+    const showDropZones = useMemo(() =>
       editorConfig && dndContext.isDragging && canAcceptChildren && !isBeingDragged,
       [editorConfig, dndContext.isDragging, canAcceptChildren, isBeingDragged]
     );
-    
+
     // Compute childProps with 'relative' class included when showDropZones is active
     // This must be recomputed when showDropZones changes to avoid stale className mutations
     const childProps: Record<string, PropValue> = useMemo(() => {
       const props = { ...resolvedProps };
-      
+
       // CRITICAL: Add position:relative to parent when showing drop zones
       // This ensures absolutely positioned DropPlaceholders position correctly
       // We check hasLayerChildren to only apply to containers that will have drop zones
@@ -163,13 +173,13 @@ export const RenderLayer: React.FC<{
           props.className = existingClassName ? `${existingClassName} relative` : 'relative';
         }
       }
-      
+
       return props;
     }, [resolvedProps, showDropZones, layer]);
 
     if (!componentDefinition) {
       console.error(
-        `[UIBuilder] Component definition not found in registry:`, 
+        `[UIBuilder] Component definition not found in registry:`,
         infoData
       );
       return null;
@@ -184,7 +194,9 @@ export const RenderLayer: React.FC<{
     }
 
     if (!Component) return null;
-    
+
+    const finalProps = { ...childProps };
+
     // Handle children rendering with improved drop zones
     if (hasLayerChildren(layer) && layer.children.length > 0) {
       const childElements = layer.children.map((child, index) => {
@@ -230,20 +242,20 @@ export const RenderLayer: React.FC<{
         );
       }
 
-      childProps.children = childElements;
+      finalProps.children = childElements;
     } else if (isVariableReference(layer.children)) {
       // Resolve variable reference for children
       const resolvedChildren = resolveChildrenVariableReference(
         layer.children, effectiveVariables, variableValues
       );
-      childProps.children = resolvedChildren;
+      finalProps.children = resolvedChildren;
     } else if (typeof layer.children === "string") {
-      childProps.children = layer.children;
+      finalProps.children = layer.children;
     } else if (showDropZones && hasLayerChildren(layer)) {
       // Show drop zone for empty containers
       // Note: position:relative is already added via useMemo when showDropZones is true
       // Add min-height so empty containers are droppable
-      childProps.children = (
+      finalProps.children = (
         <div className="min-h-[2rem] w-full">
           <DropPlaceholder
             parentId={layer.id}
@@ -255,16 +267,16 @@ export const RenderLayer: React.FC<{
     }
 
     const WrappedComponent = isPrimitive ? (
-      <Component id={layer.id} data-testid={layer.id} data-layer-id={layer.id} {...childProps} />
+      <Component id={layer.id} data-testid={layer.id} data-layer-id={layer.id} {...finalProps} />
     ) : (
       <ErrorSuspenseWrapper key={layer.id} id={layer.id}>
-        <Component data-testid={layer.id} data-layer-id={layer.id} {...childProps} />
+        <Component data-testid={layer.id} data-layer-id={layer.id} {...finalProps} />
       </ErrorSuspenseWrapper>
     );
 
     // Apply visual feedback for dragged layer (only on root dragged layer, not descendants)
     const DragFeedbackWrapper = isRootDraggedLayer ? (
-      <div 
+      <div
         className="relative opacity-50 pointer-events-none"
         data-dragging="true"
       >
@@ -309,7 +321,7 @@ export const RenderLayer: React.FC<{
     }
   },
   (prevProps, nextProps) => {
-    if(nextProps.editorConfig?.parentUpdated) {
+    if (nextProps.editorConfig?.parentUpdated) {
       return false;
     }
     const editorConfigEqual = isDeepEqual(
@@ -330,7 +342,7 @@ const ErrorSuspenseWrapper: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const loadingFallback = useMemo(() => <LoadingComponent />, []);
-  
+
   return (
     <ErrorBoundary fallbackRender={ErrorFallback}>
       <Suspense fallback={loadingFallback}>{children}</Suspense>

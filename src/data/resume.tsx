@@ -130,7 +130,7 @@ export const DATA = {
     },
     {
       title: "AnalystAI",
-      href: "https://analystai.nickb.net",
+      href: "https://analystai-one.vercel.app",
       dates: "",
       active: true,
       description:

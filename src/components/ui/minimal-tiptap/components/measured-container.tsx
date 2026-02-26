@@ -15,7 +15,7 @@ export const MeasuredContainer = <T extends React.ElementType>({
   ...props
 }: MeasuredContainerProps<T> & React.ComponentProps<T>) => {
   const innerRef = React.useRef<HTMLElement>(null)
-  const rect = useContainerSize(innerRef.current)
+  const rect = useContainerSize(innerRef)
 
   const customStyle = {
     [`--${name}-width`]: `${rect.width}px`,
