@@ -214,16 +214,12 @@ const MultipleSelector = React.forwardRef<
     const [inputValue, setInputValue] = React.useState("");
     const debouncedSearchTerm = useDebounce(inputValue, delay || 500);
 
-    const selectedValue = useMemo(() => {
-      return {
-        selectedValue: [...selected],
-        input: inputRef.current as HTMLInputElement,
-        focus: () => inputRef?.current?.focus(),
-        reset: () => setSelected([]),
-      };
-    }, [selected]);
-
-    React.useImperativeHandle(ref, () => selectedValue, [selectedValue]);
+    React.useImperativeHandle(ref, () => ({
+      selectedValue: [...selected],
+      input: inputRef.current as HTMLInputElement,
+      focus: () => inputRef?.current?.focus(),
+      reset: () => setSelected([]),
+    }), [selected]);
 
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (
@@ -600,7 +596,7 @@ const MultipleSelector = React.forwardRef<
                   disabled ||
                   selected.length < 1 ||
                   selected.filter((s) => s.fixed).length === selected.length) &&
-                  "hidden"
+                "hidden"
               )}
             >
               <X />

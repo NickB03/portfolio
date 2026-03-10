@@ -108,6 +108,26 @@ export const DATA = {
   education: [],
   projects: [
     {
+      title: "polymorph",
+      href: "https://polymorph-nb.vercel.app/",
+      dates: "",
+      active: true,
+      description:
+        "AI research platform with generative UI — a multi-step research agent orchestrates searches across Tavily, Brave, and Exa, then renders results as interactive charts, tables, timelines, and citations.",
+      technologies: [
+        "Next.js",
+        "React",
+        "AI SDK",
+        "Generative UI",
+        "Drizzle",
+        "Supabase",
+      ],
+      links: [],
+      image: "/polymorph.png",
+      video: "",
+      imageClassName: "aspect-video w-full object-cover",
+    },
+    {
       title: "vana.bot",
       href: "https://vana.bot",
       dates: "",
@@ -126,11 +146,11 @@ export const DATA = {
       links: [],
       image: "/vana-preview.jpg",
       video: "",
-      imageClassName: "h-auto w-full object-cover",
+      imageClassName: "aspect-video w-full object-cover",
     },
     {
       title: "AnalystAI",
-      href: "https://analystai.nickb.net",
+      href: "https://analystai-one.vercel.app",
       dates: "",
       active: true,
       description:
@@ -146,7 +166,7 @@ export const DATA = {
       links: [],
       image: "/analyst-ai-preview.png",
       video: "",
-      imageClassName: "h-auto w-full object-cover",
+      imageClassName: "aspect-video w-full object-cover",
     },
     /*
     {

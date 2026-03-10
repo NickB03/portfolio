@@ -91,7 +91,7 @@ export function NavBar({ leftChildren, rightChildren, showExport = true }: NavBa
   const findLayerById = useLayerStore((state) => state.findLayerById);
   const componentRegistry = useEditorStore((state) => state.registry);
   const incrementRevision = useEditorStore((state) => state.incrementRevision);
-  
+
   // Panel visibility state
   const showLeftPanel = useEditorStore((state) => state.showLeftPanel);
   const setShowLeftPanel = useEditorStore((state) => state.setShowLeftPanel);
@@ -194,39 +194,39 @@ export function NavBar({ leftChildren, rightChildren, showExport = true }: NavBa
         {leftChildren}
         {leftChildren && <div className="hidden md:flex h-10 w-px bg-border"></div>}
         <div className="hidden md:contents">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              onClick={handleToggleLeftPanel}
-              variant={showLeftPanel ? "secondary" : "outline"}
-              size="icon"
-              className="flex flex-col justify-center"
-            >
-              <span className="sr-only">Toggle Left Panel</span>
-              <PanelLeft className="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            {showLeftPanel ? "Hide" : "Show"} Left Panel
-          </TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleToggleLeftPanel}
+                variant={showLeftPanel ? "secondary" : "outline"}
+                size="icon"
+                className="flex flex-col justify-center"
+              >
+                <span className="sr-only">Toggle Left Panel</span>
+                <PanelLeft className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {showLeftPanel ? "Hide" : "Show"} Left Panel
+            </TooltipContent>
+          </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              onClick={handleToggleRightPanel}
-              variant={showRightPanel ? "secondary" : "outline"}
-              size="icon"
-              className="flex flex-col justify-center"
-            >
-              <span className="sr-only">Toggle Right Panel</span>
-              <PanelRight className="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            {showRightPanel ? "Hide" : "Show"} Right Panel
-          </TooltipContent>
-        </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={handleToggleRightPanel}
+                variant={showRightPanel ? "secondary" : "outline"}
+                size="icon"
+                className="flex flex-col justify-center"
+              >
+                <span className="sr-only">Toggle Right Panel</span>
+                <PanelRight className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {showRightPanel ? "Hide" : "Show"} Right Panel
+            </TooltipContent>
+          </Tooltip>
         </div>
         <div className="hidden md:flex h-10 w-px bg-border"></div>
         <PagesPopover />
@@ -623,7 +623,6 @@ function PagesPopover() {
   const { pages, selectedPageId, addPageLayer, selectPage } = useLayerStore();
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedPage, setSelectedPage] = useState<string | null>(
     selectedPageId
   );

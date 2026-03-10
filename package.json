@@ -64,6 +64,8 @@
     "content-collections": "^0.2.1",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
+    "embla-carousel-autoplay": "^8.6.0",
+    "embla-carousel-react": "^8.6.0",
     "fast-deep-equal": "^3.1.3",
     "he-tree-react": "^1.2.0",
     "immer": "^11.1.3",

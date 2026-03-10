@@ -147,8 +147,8 @@ export const ElementSelector: React.FC<ElementSelectorProps> = ({
             isBeingDragged
               ? "border-2 border-green-500 border-dashed shadow-lg opacity-70 bg-orange-50/20"
               : isSelected
-              ? "border-2 border-blue-500 hover:border-blue-500 hover:bg-transparent  hover:shadow-none"
-              : ""
+                ? "border-2 border-blue-500 hover:border-blue-500 hover:bg-transparent  hover:shadow-none"
+                : ""
           )}
           style={overlayStyle}
         ></div>
@@ -268,13 +268,13 @@ export const MeasureRange: React.FC<MeasureRangeProps> = ({
         const hasChanged =
           !lastMeasurementRef.current ||
           Math.abs(lastMeasurementRef.current.top - newRect.top) >
-            MIN_CHANGE_THRESHOLD ||
+          MIN_CHANGE_THRESHOLD ||
           Math.abs(lastMeasurementRef.current.left - newRect.left) >
-            MIN_CHANGE_THRESHOLD ||
+          MIN_CHANGE_THRESHOLD ||
           Math.abs(lastMeasurementRef.current.width - newRect.width) >
-            MIN_CHANGE_THRESHOLD ||
+          MIN_CHANGE_THRESHOLD ||
           Math.abs(lastMeasurementRef.current.height - newRect.height) >
-            MIN_CHANGE_THRESHOLD;
+          MIN_CHANGE_THRESHOLD;
 
         if (hasChanged) {
           lastMeasurementRef.current = newRect;
@@ -377,9 +377,9 @@ export const MeasureRange: React.FC<MeasureRangeProps> = ({
       // Iframe-specific containers if we're in an iframe
       ...(frameContext.document
         ? [
-            frameContext.document.getElementById("frame-root"),
-            frameContext.document.body,
-          ]
+          frameContext.document.getElementById("frame-root"),
+          frameContext.document.body,
+        ]
         : []),
     ].filter(Boolean) as HTMLElement[];
 
@@ -401,7 +401,6 @@ export const MeasureRange: React.FC<MeasureRangeProps> = ({
     });
 
     // Listen to both parent window and iframe window events
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const setupWindowListeners = (win: Window, _: string) => {
       const windowScrollHandler = () => {
         measureElements();

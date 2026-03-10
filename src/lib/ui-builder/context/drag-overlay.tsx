@@ -4,7 +4,7 @@ import { DragOverlay } from '@dnd-kit/core';
 import { useLayerStore } from '@/lib/ui-builder/store/layer-store';
 
 // Custom DragOverlay that renders inside the transform container
-export const TransformAwareDragOverlay: React.FC<{ 
+export const TransformAwareDragOverlay: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const [mountNode, setMountNode] = useState<HTMLElement | null>(null);
@@ -24,6 +24,7 @@ export const TransformAwareDragOverlay: React.FC<{
     // Try to find the transform component container where we want to render the overlay
     const transformComponent = document.querySelector('[data-testid="transform-component"]') as HTMLElement;
     if (transformComponent) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMountNode(transformComponent);
     } else {
       // Fallback to editor panel container
@@ -59,10 +60,10 @@ interface DragOverlayContentProps {
 /* istanbul ignore next */
 export const DragOverlayContent: React.FC<DragOverlayContentProps> = ({ layerId, componentType }) => {
   const layer = useLayerStore((state) => layerId ? state.findLayerById(layerId) : null);
-  
+
   // Determine display name from layer or component type
   const displayName = layer?.name || layer?.type || componentType || 'Component';
-  
+
   if (!layer && !componentType) {
     return null;
   }

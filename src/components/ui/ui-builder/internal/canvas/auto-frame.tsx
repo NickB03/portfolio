@@ -74,7 +74,7 @@ const CopyHostStyles = ({
 
   useEffect(() => {
     if (!win || !doc) {
-      return () => {};
+      return () => { };
     }
 
     const elements: { original: HTMLElement; mirror: HTMLElement }[] = [];
@@ -239,6 +239,7 @@ const CopyHostStyles = ({
     syncAttributes(parentBody, doc.body);
 
     // Set iframe body background to transparent
+    // eslint-disable-next-line react-hooks/immutability
     doc.body.style.backgroundColor = "transparent";
 
     // Copy CSS custom properties (variables) from parent html element
@@ -355,8 +356,8 @@ const AutoFrame = forwardRef<HTMLIFrameElement, AutoFrameProps>(({
   className,
   debug,
   id,
-  onReady = () => {},
-  onNotReady = () => {},
+  onReady = () => { },
+  onNotReady = () => { },
   style,
   pointerEventsEnabled = true,
   ...props

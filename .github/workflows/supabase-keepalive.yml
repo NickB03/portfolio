@@ -1,0 +1,45 @@
+name: Supabase Keepalive
+
+on:
+  schedule:
+    # Runs at 00:00 every 5th day of the month (roughly every 5 days)
+    # Note: GitHub Actions cron syntax doesn't directly support "every 5 days".
+    # Using specific days gives us consistent execution.
+    - cron: '0 0 1,6,11,16,21,26 * *'
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase Database
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+            echo "Error: Supabase secrets are not set in GitHub repository settings."
+            exit 1
+          fi
+
+          echo "Pinging Supabase REST API to keep project alive..."
+          
+          # We make a simple GET request to the REST API, just querying for 1 row
+          # This counts as activity and prevents the project from being paused
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${SUPABASE_URL}/rest/v1/knowledge_chunks?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_KEY}")
+
+          echo "Response HTTP Status: $HTTP_STATUS"
+
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+            echo "Successfully pinged Supabase."
+          # Allow 404 just in case there's no data or the table name changes in the future,
+          # reaching the API is what keeps the project awake.
+          elif [ "$HTTP_STATUS" -eq 404 ]; then
+            echo "Pinged Supabase (Table not found, but API is reachable). Project is awake."
+          else
+            echo "Failed to ping Supabase. Check your configuration."
+            exit 1
+          fi

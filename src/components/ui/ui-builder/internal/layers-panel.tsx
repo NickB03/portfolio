@@ -105,7 +105,7 @@ export const LayersTree: React.FC<LayersTreeProps> = React.memo(
       (newLayers: unknown) => {
         if (Array.isArray(newLayers) && newLayers.length > 0) {
           const updatedPageLayer = newLayers[0] as ComponentLayer;
-          
+
           // Validate the layer structure before updating
           if (!updatedPageLayer || !updatedPageLayer.id || updatedPageLayer.id !== selectedPageId) {
             console.error(
@@ -114,15 +114,15 @@ export const LayersTree: React.FC<LayersTreeProps> = React.memo(
             );
             return;
           }
-          
+
           const updatedChildren = hasLayerChildren(updatedPageLayer)
             ? updatedPageLayer.children || []
             : [];
-            
+
           // Only update if children actually changed
           const currentLayer = layers[0];
           const currentChildren = currentLayer && hasLayerChildren(currentLayer) ? currentLayer.children || [] : [];
-          
+
           if (!isDeepEqual(currentChildren, updatedChildren)) {
             updateLayer(selectedPageId, {}, { children: updatedChildren });
           }
@@ -154,7 +154,7 @@ export const LayersTree: React.FC<LayersTreeProps> = React.memo(
       ({ stat, attrs, isPlaceholder }: any) => {
         // Use node.id as key to ensure stable identity across tree operations
         const stableKey = isPlaceholder ? `placeholder-${attrs.key}` : stat.node.id;
-        
+
         if (isPlaceholder) {
           return (
             <TreeRowPlaceholder
@@ -163,7 +163,7 @@ export const LayersTree: React.FC<LayersTreeProps> = React.memo(
             />
           );
         }
-        
+
         // Find the original layer data (not processed) to preserve text children info
         const findOriginalLayer = (layers: ComponentLayer[], id: string): ComponentLayer | null => {
           for (const layer of layers) {
@@ -175,9 +175,9 @@ export const LayersTree: React.FC<LayersTreeProps> = React.memo(
           }
           return null;
         };
-        
+
         const originalNode = findOriginalLayer(layers, stat.node.id) || stat.node;
-        
+
         return (
           <TreeRowNode
             key={stableKey}
@@ -211,7 +211,7 @@ export const LayersTree: React.FC<LayersTreeProps> = React.memo(
     const processedLayers = useMemo(() => {
       const processLayer = (layer: ComponentLayer): ComponentLayer => {
         const processed = { ...layer };
-        
+
         if (hasLayerChildren(layer)) {
           // Recursively process array children
           processed.children = layer.children.map(processLayer);
@@ -223,10 +223,10 @@ export const LayersTree: React.FC<LayersTreeProps> = React.memo(
           // Ensure undefined/null children become empty arrays
           processed.children = [];
         }
-        
+
         return processed;
       };
-      
+
       return layers.map(processLayer);
     }, [layers]);
 
@@ -260,17 +260,18 @@ export const LayersTree: React.FC<LayersTreeProps> = React.memo(
           selectedLayerId
         );
         const parentIds = parentLayers.map((layer) => layer.id);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setOpenIdsArray((prevOpenIds) => {
           const newIds = [...prevOpenIds];
           let hasChanges = false;
-          
+
           parentIds.forEach((id) => {
             if (!newIds.includes(id)) {
               newIds.push(id);
               hasChanges = true;
             }
           });
-          
+
           return hasChanges ? newIds : prevOpenIds;
         });
       }
