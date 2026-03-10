@@ -83,6 +83,15 @@
       filter: drop-shadow(0 0 4px rgba(139, 92, 246, 0.4)) drop-shadow(0 0 8px rgba(139, 92, 246, 0.2));
     }
   }
+
+  @keyframes carousel-progress {
+    from {
+      width: 0%;
+    }
+    to {
+      width: 100%;
+    }
+  }
 }
 
 :root {
