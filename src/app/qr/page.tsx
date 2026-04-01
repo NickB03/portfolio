@@ -48,7 +48,7 @@ export default function QRPage() {
   };
 
   return (
-    <div className="relative flex min-h-svh items-center justify-center overflow-hidden bg-background px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden overscroll-none bg-background px-4">
       {/* Flickering grid background */}
       <div className="absolute inset-0">
         <FlickeringGrid
@@ -69,7 +69,7 @@ export default function QRPage() {
             "relative z-10 flex w-full max-w-sm flex-col items-center gap-6",
             "rounded-3xl border border-border bg-card/80 p-8 shadow-lg backdrop-blur-xl",
             "sm:p-10",
-            "select-none touch-pan-y"
+            "select-none touch-none"
           )}
         >
           {/* Header */}
