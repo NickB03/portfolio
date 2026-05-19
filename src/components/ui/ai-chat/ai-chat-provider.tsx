@@ -89,11 +89,16 @@ export function AIChatProvider({ children }: AIChatProviderProps) {
             messages[messages.length - 1]?.isError
             ? messages.slice(0, -1)
             : messages;
+        const historySource = !appendUser &&
+            baseMessages[baseMessages.length - 1]?.role === "user" &&
+            baseMessages[baseMessages.length - 1]?.content === trimmedContent
+            ? baseMessages.slice(0, -1)
+            : baseMessages;
 
         lastUserMessageRef.current = trimmedContent;
 
         // Build history from existing messages before adding the new one
-        const history = baseMessages
+        const history = historySource
             .filter((m) => m.content && !m.isError)
             .slice(-10)
             .map((m) => ({ role: m.role, content: m.content }));

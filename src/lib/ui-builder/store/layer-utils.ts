@@ -425,22 +425,18 @@ export const moveLayer = (
   targetPosition: number
 ): ComponentLayer[] => {
   let layerToMove: ComponentLayer | null = null;
-  let sourceParentId: string | null = null;
-  let sourcePosition: number = -1;
 
   // Find the layer to move and its current parent
-  const findLayerAndParent = (layers: ComponentLayer[], parentId: string | null = null): boolean => {
+  const findLayerAndParent = (layers: ComponentLayer[]): boolean => {
     for (let i = 0; i < layers.length; i++) {
       const layer = layers[i];
       if (!layer) continue;
       if (layer.id === sourceLayerId) {
         layerToMove = layer;
-        sourceParentId = parentId;
-        sourcePosition = i;
         return true;
       }
       if (hasLayerChildren(layer) && layer.children) {
-        if (findLayerAndParent(layer.children, layer.id)) {
+        if (findLayerAndParent(layer.children)) {
           return true;
         }
       }

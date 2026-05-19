@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Personal portfolio site for Nick Bohmer (nickbohmer.com). Next.js 16 App Router with React 19, TypeScript, Tailwind CSS 4, and an AI chat assistant powered by a RAG pipeline (Gemini + Supabase pgvector).
+Personal portfolio site for Nick Bohmer (nickb.net). Next.js 16 App Router with React 19, TypeScript, Tailwind CSS 4, and an AI chat assistant powered by a RAG pipeline (Gemini + Supabase pgvector).
 
 ## Commands
 
