@@ -7,12 +7,15 @@ import { DATA } from "@/data/resume";
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
 
 type EmblaApi = UseEmblaCarouselType[1];
 
 const projects = DATA.projects;
 const slides = [...projects, ...projects];
+const POLYMORPH_PROJECT_INDEX = Math.max(
+  projects.findIndex((project) => project.title === "polymorph"),
+  0
+);
 
 const TWEEN_FACTOR = 2.4;
 
@@ -20,17 +23,13 @@ const numberWithinRange = (n: number, min: number, max: number) =>
   Math.min(Math.max(n, min), max);
 
 export default function ProjectsSection() {
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, align: "center", slidesToScroll: 1 },
-    [
-      Autoplay({
-        delay: 3000,
-        stopOnInteraction: false,
-        stopOnMouseEnter: true,
-      }),
-    ]
-  );
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: "center",
+    slidesToScroll: 1,
+    startIndex: POLYMORPH_PROJECT_INDEX,
+  });
+  const [selectedIndex, setSelectedIndex] = useState(POLYMORPH_PROJECT_INDEX);
   const activeProject = selectedIndex % projects.length;
   const tweenNodes = useRef<HTMLElement[]>([]);
 

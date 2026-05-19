@@ -36,7 +36,7 @@ export const DATA = {
     social: {
       GitHub: {
         name: "GitHub",
-        url: "https://github.com/NickB03/vana",
+        url: "https://github.com/NickB03/polymorph",
         icon: Icons.github,
         navbar: true,
       },
@@ -109,7 +109,7 @@ export const DATA = {
   projects: [
     {
       title: "polymorph",
-      href: "https://polymorph-nb.vercel.app/",
+      href: "https://polymorph.fyi",
       dates: "",
       active: true,
       description:
@@ -123,7 +123,13 @@ export const DATA = {
         "Arize Phoenix",
         "Supabase",
       ],
-      links: [],
+      links: [
+        {
+          type: "GitHub",
+          href: "https://github.com/NickB03/polymorph",
+          icon: <Icons.github className="size-3" />,
+        },
+      ],
       image: "/polymorph.png",
       video: "",
       imageClassName: "aspect-video w-full object-cover",
