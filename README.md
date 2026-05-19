@@ -85,7 +85,8 @@ supabase/                   # Database migrations
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anonymous key
    - `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role key
    - `GEMINI_API_KEY` — Google Gemini API key for embeddings and responses
-   - `NEXT_PUBLIC_ENABLE_AI_CHAT` — Set to `true` to enable the AI chat feature
+   - `ENABLE_AI_CHAT` — Server-side flag that enables the `/api/chat` endpoint
+   - `NEXT_PUBLIC_ENABLE_AI_CHAT` — Client-side flag that shows the AI chat UI
 
 4. **Seed the knowledge base** (optional, for AI chat)
 

@@ -13,13 +13,14 @@ npm run dev          # Start dev server (localhost:3000)
 npm run build        # Production build
 npm run lint         # ESLint check
 npm run lint:fix     # Auto-fix lint issues
+npm run test:chat-flags  # Verify the chat API uses the server-only feature flag
 npm run preview      # Build and preview Cloudflare deployment locally
-npm run deploy       # Build and deploy to Cloudflare Pages
+npm run deploy       # Build and deploy to Cloudflare Workers
 npx tsx scripts/seed-knowledge.ts    # Seed AI knowledge base from nick-info.md
 npx tsx scripts/verify-knowledge.ts  # Verify knowledge base entries
 ```
 
-No test framework is configured — there are no automated tests.
+Focused tests use Node's built-in test runner.
 
 ## Architecture
 
@@ -37,7 +38,7 @@ No test framework is configured — there are no automated tests.
 - **History**: Capped at 10 messages; follow-up queries are rewritten for context
 - **Client state**: React Context via `AIChatProvider` (`src/components/ui/ai-chat/ai-chat-provider.tsx`)
 - **Knowledge base**: Seeded from `nick-info.md` via `scripts/seed-knowledge.ts` — chunks text with metadata (source, type, topics), embeds via Gemini, stores in Supabase
-- **Feature flag**: `NEXT_PUBLIC_ENABLE_AI_CHAT=true` enables the chat UI
+- **Feature flags**: `ENABLE_AI_CHAT=true` enables the server endpoint; `NEXT_PUBLIC_ENABLE_AI_CHAT=true` shows the chat UI
 
 ### Component Organization
 - `src/components/ui/` — shadcn/ui components (Radix primitives + Tailwind). Config in `components.json` (style: "new-york", icon library: lucide)
@@ -78,7 +79,7 @@ No test framework is configured — there are no automated tests.
 Required in `.env.local` (see `.env.local.example`):
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - `GEMINI_API_KEY` (for AI chat)
-- `NEXT_PUBLIC_ENABLE_AI_CHAT` (feature flag)
+- `ENABLE_AI_CHAT` (server endpoint flag), `NEXT_PUBLIC_ENABLE_AI_CHAT` (client UI flag)
 
 ## Conventions
 

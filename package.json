@@ -9,6 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test:chat-flags": "node --test tests/chat-feature-flag.test.js",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",

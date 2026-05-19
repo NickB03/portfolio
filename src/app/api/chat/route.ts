@@ -323,7 +323,7 @@ ${question}`,
 
 export async function POST(request: Request) {
     try {
-        if (process.env.NEXT_PUBLIC_ENABLE_AI_CHAT !== "true") {
+        if (process.env.ENABLE_AI_CHAT !== "true") {
             return jsonResponse(
                 {
                     error: "Not Found",
