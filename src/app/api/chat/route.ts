@@ -29,6 +29,69 @@ AVOID:
 - Over-formatting with bold text and nested bullets
 - Wordy, roundabout phrasing — get to the point`;
 
+const CHAT_RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
+const CHAT_RATE_LIMIT_MAX_REQUESTS = 10;
+
+interface RateLimitEntry {
+    count: number;
+    resetAt: number;
+}
+
+const chatRateLimit = new Map<string, RateLimitEntry>();
+
+function jsonResponse(
+    body: Record<string, unknown>,
+    status: number,
+    headers: Record<string, string> = {}
+) {
+    return new Response(JSON.stringify(body), {
+        status,
+        headers: {
+            "Content-Type": "application/json",
+            ...headers,
+        },
+    });
+}
+
+function getTrustedClientIp(request: Request): string | null {
+    const cfConnectingIp = request.headers.get("cf-connecting-ip")?.trim();
+    if (cfConnectingIp) return cfConnectingIp;
+
+    return null;
+}
+
+function checkRateLimit(request: Request): { retryAfter: number } | null {
+    const now = Date.now();
+
+    for (const [key, entry] of chatRateLimit.entries()) {
+        if (entry.resetAt <= now) {
+            chatRateLimit.delete(key);
+        }
+    }
+
+    const key = getTrustedClientIp(request);
+    if (!key) return null;
+
+    const existing = chatRateLimit.get(key);
+
+    if (!existing) {
+        chatRateLimit.set(key, {
+            count: 1,
+            resetAt: now + CHAT_RATE_LIMIT_WINDOW_MS,
+        });
+        return null;
+    }
+
+    if (existing.count >= CHAT_RATE_LIMIT_MAX_REQUESTS) {
+        return {
+            retryAfter: Math.max(1, Math.ceil((existing.resetAt - now) / 1000)),
+        };
+    }
+
+    existing.count += 1;
+    return null;
+}
+
 async function generateEmbedding(text: string): Promise<number[]> {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -65,7 +128,6 @@ async function searchKnowledge(
 ): Promise<{ content: string; metadata: Record<string, unknown>; similarity: number }[]> {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await (supabase.rpc as any)("search_knowledge", {
         query_embedding: queryEmbedding,
         match_threshold: 0.5,
@@ -258,13 +320,42 @@ ${question}`,
 
 export async function POST(request: Request) {
     try {
-        const { message, history: rawHistory } = await request.json();
+        if (process.env.ENABLE_AI_CHAT !== "true") {
+            return jsonResponse(
+                {
+                    error: "Not Found",
+                    message: "The AI assistant is currently disabled.",
+                },
+                404
+            );
+        }
+
+        let requestBody: unknown;
+        try {
+            requestBody = await request.json();
+        } catch {
+            return jsonResponse(
+                {
+                    error: "Malformed JSON",
+                    message: "Please send a valid JSON request body.",
+                },
+                400
+            );
+        }
+
+        const { message, history: rawHistory } =
+            typeof requestBody === "object" && requestBody !== null
+                ? (requestBody as { message?: unknown; history?: unknown })
+                : {};
 
         if (!message || typeof message !== "string") {
-            return new Response(JSON.stringify({ error: "Message is required" }), {
-                status: 400,
-                headers: { "Content-Type": "application/json" },
-            });
+            return jsonResponse(
+                {
+                    error: "Message is required",
+                    message: "Please enter a message before sending.",
+                },
+                400
+            );
         }
 
         // Validate and cap history to last 10 messages
@@ -280,16 +371,34 @@ export async function POST(request: Request) {
                   .slice(-10)
             : [];
 
+        const rateLimit = checkRateLimit(request);
+        if (rateLimit) {
+            return jsonResponse(
+                {
+                    error: "Rate limit exceeded",
+                    message: "Too many chat requests. Please wait a few minutes and try again.",
+                    retryAfter: rateLimit.retryAfter,
+                },
+                429,
+                {
+                    "Retry-After": String(rateLimit.retryAfter),
+                }
+            );
+        }
+
         // Initialize Supabase
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
         const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
         if (!supabaseUrl || !supabaseKey) {
             console.error("Missing Supabase configuration");
-            return new Response(JSON.stringify({ error: "Server configuration error" }), {
-                status: 500,
-                headers: { "Content-Type": "application/json" },
-            });
+            return jsonResponse(
+                {
+                    error: "Server configuration error",
+                    message: "The AI assistant is not properly configured. Please contact the site administrator.",
+                },
+                500
+            );
         }
 
         // Rewrite follow-up queries into standalone questions for better embedding
@@ -328,18 +437,15 @@ export async function POST(request: Request) {
 
                     // Check if fallback also hit quota
                     if (fallbackError instanceof Error && fallbackError.message === "QUOTA_EXCEEDED") {
-                        return new Response(
-                            JSON.stringify({
+                        return jsonResponse(
+                            {
                                 error: "API quota temporarily exceeded",
                                 message: "The AI assistant is temporarily unavailable due to high usage. Please try again in a few minutes.",
                                 retryAfter: 60
-                            }),
+                            },
+                            503,
                             {
-                                status: 503,
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "Retry-After": "60"
-                                },
+                                "Retry-After": "60"
                             }
                         );
                     }
@@ -364,28 +470,22 @@ export async function POST(request: Request) {
 
         // Check for specific error types
         if (errorMessage.includes("GEMINI_API_KEY is not set")) {
-            return new Response(
-                JSON.stringify({
+            return jsonResponse(
+                {
                     error: "Configuration error",
                     message: "The AI assistant is not properly configured. Please contact the site administrator."
-                }),
-                {
-                    status: 500,
-                    headers: { "Content-Type": "application/json" },
-                }
+                },
+                500
             );
         }
 
-        return new Response(
-            JSON.stringify({
+        return jsonResponse(
+            {
                 error: "An error occurred processing your request",
                 message: "Something went wrong. Please try again later.",
                 details: process.env.NODE_ENV === "development" ? errorMessage : undefined
-            }),
-            {
-                status: 500,
-                headers: { "Content-Type": "application/json" },
-            }
+            },
+            500
         );
     }
 }

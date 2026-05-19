@@ -15,11 +15,11 @@ import { Csharp } from "@/components/ui/svgs/csharp";
 export const DATA = {
   name: "Nick Bohmer",
   initials: "NB",
-  url: "https://vana.bot",
+  url: "https://nickb.net",
   location: "Dallas, TX",
   locationLink: "https://www.google.com/maps/place/Dallas,+TX",
   description:
-    "",
+    "Personal portfolio for Nick Bohmer, a product management leader building enterprise networking, security, and AI products.",
   summary:
     "Product leader and hands-on builder focused on enterprise networking, security, and AI-enabled product development. I bridge strategy and execution across product vision, go-to-market planning, pricing and packaging, and cross-functional delivery.\n\nI build AI applications hands-on (Polymorph, AnalystAI, multi-agent platforms) to pressure-test capability, inform product strategy, and accelerate practical experimentation. Working through multi-agent frameworks gives me firsthand insight into the strengths and limits of modern AI systems.\n\nThat perspective helps me collaborate more effectively with engineering teams, drive product decisions grounded in real implementation challenges, and push the boundaries of what's possible in AI-driven enterprise products.",
   avatarUrl: "/me.jpg",

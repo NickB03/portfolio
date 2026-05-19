@@ -3,18 +3,30 @@
 import { motion, AnimatePresence, useDragControls } from "motion/react";
 import { X, Send, Loader2, ArrowLeft, RotateCcw } from "lucide-react";
 import { useAIChat } from "./ai-chat-provider";
-import { useState, useRef, useEffect, useCallback, type KeyboardEvent, type PointerEvent } from "react";
+import { useState, useRef, useEffect, useCallback, useSyncExternalStore, type KeyboardEvent, type PointerEvent } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Markdown from "react-markdown";
 import { SiriOrb } from "./siri-orb";
 import { cn } from "@/lib/utils";
 
+function useMediaQuery(query: string) {
+    return useSyncExternalStore(
+        (onStoreChange) => {
+            if (typeof window === "undefined") return () => {};
+
+            const mediaQuery = window.matchMedia(query);
+            const handler = () => onStoreChange();
+            mediaQuery.addEventListener("change", handler);
+
+            return () => mediaQuery.removeEventListener("change", handler);
+        },
+        () => typeof window !== "undefined" && window.matchMedia(query).matches,
+        () => false
+    );
+}
+
 function useIsTouchDevice() {
-    const [isTouch, setIsTouch] = useState(false);
-    useEffect(() => {
-        setIsTouch(window.matchMedia("(pointer: coarse)").matches);
-    }, []);
-    return isTouch;
+    return useMediaQuery("(pointer: coarse)");
 }
 
 function useKeyboardOffset() {
@@ -36,15 +48,7 @@ function useKeyboardOffset() {
 }
 
 function usePrefersReducedMotion() {
-    const [reduced, setReduced] = useState(false);
-    useEffect(() => {
-        const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-        setReduced(mq.matches);
-        const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
-        mq.addEventListener("change", handler);
-        return () => mq.removeEventListener("change", handler);
-    }, []);
-    return reduced;
+    return useMediaQuery("(prefers-reduced-motion: reduce)");
 }
 
 export function AIChatPopup() {
@@ -152,7 +156,7 @@ export function AIChatPopup() {
                                     </div>
                                     {message.isError && (
                                         <button
-                                            onClick={retryLastMessage}
+                                            onClick={() => retryLastMessage(message.id)}
                                             className="mt-2.5 flex items-center gap-1.5 rounded-lg border border-chat-border bg-chat-surface px-3 py-1.5 text-sm text-chat-text-secondary transition-all hover:bg-chat-bg hover:text-chat-text active:scale-95"
                                         >
                                             <RotateCcw className="h-3.5 w-3.5" />

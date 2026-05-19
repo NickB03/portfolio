@@ -105,26 +105,29 @@ export default function ProjectsSection() {
     if (!emblaApi) return;
 
     const onSelect = () => setSelectedIndex(emblaApi.selectedScrollSnap());
+    const onReInit = () => {
+      setTweenNodes(emblaApi);
+      tweenSlides(emblaApi);
+      onSelect();
+    };
+    const onScroll = () => tweenSlides(emblaApi, "scroll");
+    const onSlideFocus = () => tweenSlides(emblaApi);
 
     setTweenNodes(emblaApi);
     tweenSlides(emblaApi);
     onSelect();
 
     emblaApi
-      .on("reInit", () => {
-        setTweenNodes(emblaApi);
-        tweenSlides(emblaApi);
-        onSelect();
-      })
-      .on("scroll", () => tweenSlides(emblaApi, "scroll"))
-      .on("slideFocus", () => tweenSlides(emblaApi))
+      .on("reInit", onReInit)
+      .on("scroll", onScroll)
+      .on("slideFocus", onSlideFocus)
       .on("select", onSelect);
 
     return () => {
       emblaApi
-        .off("reInit", onSelect)
-        .off("scroll", onSelect)
-        .off("slideFocus", onSelect)
+        .off("reInit", onReInit)
+        .off("scroll", onScroll)
+        .off("slideFocus", onSlideFocus)
         .off("select", onSelect);
     };
   }, [emblaApi, tweenSlides, setTweenNodes]);

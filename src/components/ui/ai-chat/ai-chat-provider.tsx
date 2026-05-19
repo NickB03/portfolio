@@ -9,11 +9,45 @@ import {
     type ReactNode,
 } from "react";
 
-interface Message {
+export interface Message {
     id: string;
     role: "user" | "assistant";
     content: string;
     isError?: boolean;
+}
+
+interface SendMessageOptions {
+    appendUser?: boolean;
+    replaceLastError?: boolean;
+    retryAssistantId?: string;
+}
+
+interface RetryTurn {
+    content: string;
+    historyMessages: Message[];
+}
+
+export function getRetryTurn(messages: Message[], failedAssistantId: string): RetryTurn | null {
+    const assistantIndex = messages.findIndex(
+        (message) =>
+            message.id === failedAssistantId &&
+            message.role === "assistant" &&
+            message.isError
+    );
+
+    if (assistantIndex <= 0) return null;
+
+    for (let index = assistantIndex - 1; index >= 0; index--) {
+        const message = messages[index];
+        if (message?.role === "user" && message.content.trim()) {
+            return {
+                content: message.content,
+                historyMessages: messages.slice(0, index),
+            };
+        }
+    }
+
+    return null;
 }
 
 interface AIChatContextType {
@@ -23,14 +57,14 @@ interface AIChatContextType {
     toggle: () => void;
     messages: Message[];
     isLoading: boolean;
-    sendMessage: (content: string) => Promise<void>;
+    sendMessage: (content: string, options?: SendMessageOptions) => Promise<void>;
     clearMessages: () => void;
-    retryLastMessage: () => void;
+    retryLastMessage: (failedAssistantId?: string) => void;
 }
 
 const AIChatContext = createContext<AIChatContextType | null>(null);
 
-export function useAIChat() {
+export function useAIChat(): AIChatContextType {
     const context = useContext(AIChatContext);
     if (!context) {
         // Return no-op functions when not in provider (e.g., when AI chat is disabled)
@@ -41,9 +75,9 @@ export function useAIChat() {
             toggle: () => {},
             messages: [],
             isLoading: false,
-            sendMessage: async () => {},
+            sendMessage: async (_content: string, _options?: SendMessageOptions) => {},
             clearMessages: () => {},
-            retryLastMessage: () => {},
+            retryLastMessage: (_failedAssistantId?: string) => {},
         };
     }
     return context;
@@ -76,13 +110,38 @@ export function AIChatProvider({ children }: AIChatProviderProps) {
         setMessages([]);
     }, []);
 
-    const sendMessage = useCallback(async (content: string) => {
-        if (!content.trim() || isLoading) return;
+    const sendMessage = useCallback(async (
+        content: string,
+        options: SendMessageOptions = {}
+    ) => {
+        if (isLoading) return;
 
-        lastUserMessageRef.current = content.trim();
+        const retryTurn = options.retryAssistantId
+            ? getRetryTurn(messages, options.retryAssistantId)
+            : null;
+        const trimmedContent = retryTurn?.content.trim() ?? content.trim();
+        if (!trimmedContent) return;
+
+        const appendUser = retryTurn ? false : options.appendUser ?? true;
+        const baseMessages = retryTurn
+            ? messages
+            : options.replaceLastError &&
+            messages[messages.length - 1]?.role === "assistant" &&
+            messages[messages.length - 1]?.isError
+                ? messages.slice(0, -1)
+                : messages;
+        const historySource = retryTurn
+            ? retryTurn.historyMessages
+            : !appendUser &&
+            baseMessages[baseMessages.length - 1]?.role === "user" &&
+            baseMessages[baseMessages.length - 1]?.content === trimmedContent
+                ? baseMessages.slice(0, -1)
+                : baseMessages;
+
+        lastUserMessageRef.current = trimmedContent;
 
         // Build history from existing messages before adding the new one
-        const history = messages
+        const history = historySource
             .filter((m) => m.content && !m.isError)
             .slice(-10)
             .map((m) => ({ role: m.role, content: m.content }));
@@ -90,18 +149,28 @@ export function AIChatProvider({ children }: AIChatProviderProps) {
         const userMessage: Message = {
             id: `user-${Date.now()}`,
             role: "user",
-            content: content.trim(),
+            content: trimmedContent,
         };
 
-        setMessages((prev) => [...prev, userMessage]);
         setIsLoading(true);
 
         // Create placeholder for assistant response
-        const assistantId = `assistant-${Date.now()}`;
-        setMessages((prev) => [
-            ...prev,
-            { id: assistantId, role: "assistant", content: "" },
-        ]);
+        const assistantId = options.retryAssistantId ?? `assistant-${Date.now()}`;
+        const assistantMessage: Message = {
+            id: assistantId,
+            role: "assistant",
+            content: "",
+        };
+
+        setMessages(
+            retryTurn
+                ? messages.map((message) =>
+                    message.id === assistantId ? assistantMessage : message
+                )
+                : appendUser
+                    ? [...baseMessages, userMessage, assistantMessage]
+                    : [...baseMessages, assistantMessage]
+        );
 
         const controller = new AbortController();
         abortControllerRef.current = controller;
@@ -113,7 +182,7 @@ export function AIChatProvider({ children }: AIChatProviderProps) {
             const response = await fetch("/api/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: content, history }),
+                body: JSON.stringify({ message: trimmedContent, history }),
                 signal: controller.signal,
             });
 
@@ -125,6 +194,12 @@ export function AIChatProvider({ children }: AIChatProviderProps) {
                 const contentType = response.headers.get("content-type");
                 if (contentType?.includes("application/json")) {
                     const errorData = await response.json();
+                    const structuredMessage =
+                        typeof errorData.message === "string"
+                            ? errorData.message
+                            : typeof errorData.error === "string"
+                                ? errorData.error
+                                : null;
 
                     // Handle specific error types
                     if (response.status === 503 && errorData.error === "API quota temporarily exceeded") {
@@ -143,13 +218,13 @@ export function AIChatProvider({ children }: AIChatProviderProps) {
                     }
 
                     // Handle other structured errors
-                    if (errorData.message) {
+                    if (structuredMessage) {
                         setMessages((prev) =>
                             prev.map((msg) =>
                                 msg.id === assistantId
                                     ? {
                                         ...msg,
-                                        content: errorData.message,
+                                        content: structuredMessage,
                                         isError: true,
                                     }
                                     : msg
@@ -235,20 +310,20 @@ export function AIChatProvider({ children }: AIChatProviderProps) {
         }
     }, [isLoading, messages]);
 
-    const retryLastMessage = useCallback(() => {
-        if (!lastUserMessageRef.current || isLoading) return;
-        // Remove the last assistant (error) message before retrying
-        setMessages((prev) => {
-            const last = prev[prev.length - 1];
-            if (last?.role === "assistant" && last.isError) {
-                return prev.slice(0, -1);
-            }
-            return prev;
-        });
-        // Use setTimeout to let state update before sending
+    const retryLastMessage = useCallback((failedAssistantId?: string) => {
+        if (isLoading) return;
+        if (failedAssistantId) {
+            const retryTurn = getRetryTurn(messages, failedAssistantId);
+            if (!retryTurn) return;
+
+            void sendMessage(retryTurn.content, { retryAssistantId: failedAssistantId });
+            return;
+        }
+
+        if (!lastUserMessageRef.current) return;
         const msg = lastUserMessageRef.current;
-        setTimeout(() => sendMessage(msg), 0);
-    }, [isLoading, sendMessage]);
+        void sendMessage(msg, { appendUser: false, replaceLastError: true });
+    }, [isLoading, messages, sendMessage]);
 
     return (
         <AIChatContext.Provider

@@ -37,7 +37,6 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 
 export const classNameFieldOverrides: FieldConfigFunction = (
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   layer,
 ) => {
   return {
