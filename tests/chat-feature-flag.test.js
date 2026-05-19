@@ -27,11 +27,13 @@ function loadPostHandler() {
   return loadCommonJsModule(routePath).POST;
 }
 
-async function postChat(body) {
-  return POST(
+async function postChat(body, options = {}) {
+  const postHandler = options.postHandler || POST;
+
+  return postHandler(
     new Request("http://localhost/api/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...options.headers },
       body,
     })
   );
@@ -116,4 +118,55 @@ test("chat retry resolves the failed turn that was clicked", () => {
     historyMessages: messages.slice(0, 2),
   });
   assert.equal(getRetryTurn(messages, "missing-assistant"), null);
+});
+
+test("chat rate limiting only uses trusted Cloudflare client identity", async () => {
+  const postHandler = loadPostHandler();
+  const originalEnv = {
+    ENABLE_AI_CHAT: process.env.ENABLE_AI_CHAT,
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  };
+
+  const validBody = JSON.stringify({ message: "Hello" });
+  const statusesFor = async (headers) => {
+    const statuses = [];
+    const originalConsoleError = console.error;
+
+    try {
+      console.error = () => {};
+      for (let i = 0; i < 11; i++) {
+        const response = await postChat(validBody, { postHandler, headers });
+        statuses.push(response.status);
+      }
+    } finally {
+      console.error = originalConsoleError;
+    }
+
+    return statuses;
+  };
+
+  try {
+    process.env.ENABLE_AI_CHAT = "true";
+    delete process.env.NEXT_PUBLIC_SUPABASE_URL;
+    delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    assert.deepEqual(await statusesFor({}), Array(11).fill(500));
+    assert.deepEqual(
+      await statusesFor({ "x-forwarded-for": "203.0.113.10" }),
+      Array(11).fill(500)
+    );
+
+    const cloudflareStatuses = await statusesFor({ "cf-connecting-ip": "203.0.113.20" });
+    assert.deepEqual(cloudflareStatuses.slice(0, 10), Array(10).fill(500));
+    assert.equal(cloudflareStatuses[10], 429);
+  } finally {
+    for (const [key, value] of Object.entries(originalEnv)) {
+      if (value === undefined) {
+        delete process.env[key];
+      } else {
+        process.env[key] = value;
+      }
+    }
+  }
 });

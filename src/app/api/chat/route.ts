@@ -53,16 +53,11 @@ function jsonResponse(
     });
 }
 
-function getClientIp(request: Request) {
+function getTrustedClientIp(request: Request): string | null {
     const cfConnectingIp = request.headers.get("cf-connecting-ip")?.trim();
     if (cfConnectingIp) return cfConnectingIp;
 
-    const forwardedFor = request.headers
-        .get("x-forwarded-for")
-        ?.split(",")[0]
-        ?.trim();
-
-    return forwardedFor || "unknown";
+    return null;
 }
 
 function checkRateLimit(request: Request): { retryAfter: number } | null {
@@ -74,7 +69,9 @@ function checkRateLimit(request: Request): { retryAfter: number } | null {
         }
     }
 
-    const key = getClientIp(request);
+    const key = getTrustedClientIp(request);
+    if (!key) return null;
+
     const existing = chatRateLimit.get(key);
 
     if (!existing) {
