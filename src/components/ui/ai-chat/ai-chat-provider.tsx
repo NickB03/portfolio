@@ -9,11 +9,45 @@ import {
     type ReactNode,
 } from "react";
 
-interface Message {
+export interface Message {
     id: string;
     role: "user" | "assistant";
     content: string;
     isError?: boolean;
+}
+
+interface SendMessageOptions {
+    appendUser?: boolean;
+    replaceLastError?: boolean;
+    retryAssistantId?: string;
+}
+
+interface RetryTurn {
+    content: string;
+    historyMessages: Message[];
+}
+
+export function getRetryTurn(messages: Message[], failedAssistantId: string): RetryTurn | null {
+    const assistantIndex = messages.findIndex(
+        (message) =>
+            message.id === failedAssistantId &&
+            message.role === "assistant" &&
+            message.isError
+    );
+
+    if (assistantIndex <= 0) return null;
+
+    for (let index = assistantIndex - 1; index >= 0; index--) {
+        const message = messages[index];
+        if (message?.role === "user" && message.content.trim()) {
+            return {
+                content: message.content,
+                historyMessages: messages.slice(0, index),
+            };
+        }
+    }
+
+    return null;
 }
 
 interface AIChatContextType {
@@ -23,14 +57,14 @@ interface AIChatContextType {
     toggle: () => void;
     messages: Message[];
     isLoading: boolean;
-    sendMessage: (content: string) => Promise<void>;
+    sendMessage: (content: string, options?: SendMessageOptions) => Promise<void>;
     clearMessages: () => void;
-    retryLastMessage: () => void;
+    retryLastMessage: (failedAssistantId?: string) => void;
 }
 
 const AIChatContext = createContext<AIChatContextType | null>(null);
 
-export function useAIChat() {
+export function useAIChat(): AIChatContextType {
     const context = useContext(AIChatContext);
     if (!context) {
         // Return no-op functions when not in provider (e.g., when AI chat is disabled)
@@ -41,9 +75,9 @@ export function useAIChat() {
             toggle: () => {},
             messages: [],
             isLoading: false,
-            sendMessage: async () => {},
+            sendMessage: async (_content: string, _options?: SendMessageOptions) => {},
             clearMessages: () => {},
-            retryLastMessage: () => {},
+            retryLastMessage: (_failedAssistantId?: string) => {},
         };
     }
     return context;
@@ -78,22 +112,31 @@ export function AIChatProvider({ children }: AIChatProviderProps) {
 
     const sendMessage = useCallback(async (
         content: string,
-        options: { appendUser?: boolean; replaceLastError?: boolean } = {}
+        options: SendMessageOptions = {}
     ) => {
-        if (!content.trim() || isLoading) return;
+        if (isLoading) return;
 
-        const trimmedContent = content.trim();
-        const appendUser = options.appendUser ?? true;
-        const baseMessages = options.replaceLastError &&
+        const retryTurn = options.retryAssistantId
+            ? getRetryTurn(messages, options.retryAssistantId)
+            : null;
+        const trimmedContent = retryTurn?.content.trim() ?? content.trim();
+        if (!trimmedContent) return;
+
+        const appendUser = retryTurn ? false : options.appendUser ?? true;
+        const baseMessages = retryTurn
+            ? messages
+            : options.replaceLastError &&
             messages[messages.length - 1]?.role === "assistant" &&
             messages[messages.length - 1]?.isError
-            ? messages.slice(0, -1)
-            : messages;
-        const historySource = !appendUser &&
+                ? messages.slice(0, -1)
+                : messages;
+        const historySource = retryTurn
+            ? retryTurn.historyMessages
+            : !appendUser &&
             baseMessages[baseMessages.length - 1]?.role === "user" &&
             baseMessages[baseMessages.length - 1]?.content === trimmedContent
-            ? baseMessages.slice(0, -1)
-            : baseMessages;
+                ? baseMessages.slice(0, -1)
+                : baseMessages;
 
         lastUserMessageRef.current = trimmedContent;
 
@@ -112,16 +155,21 @@ export function AIChatProvider({ children }: AIChatProviderProps) {
         setIsLoading(true);
 
         // Create placeholder for assistant response
-        const assistantId = `assistant-${Date.now()}`;
+        const assistantId = options.retryAssistantId ?? `assistant-${Date.now()}`;
         const assistantMessage: Message = {
             id: assistantId,
             role: "assistant",
             content: "",
         };
 
-        setMessages(appendUser
-            ? [...baseMessages, userMessage, assistantMessage]
-            : [...baseMessages, assistantMessage]
+        setMessages(
+            retryTurn
+                ? messages.map((message) =>
+                    message.id === assistantId ? assistantMessage : message
+                )
+                : appendUser
+                    ? [...baseMessages, userMessage, assistantMessage]
+                    : [...baseMessages, assistantMessage]
         );
 
         const controller = new AbortController();
@@ -262,11 +310,20 @@ export function AIChatProvider({ children }: AIChatProviderProps) {
         }
     }, [isLoading, messages]);
 
-    const retryLastMessage = useCallback(() => {
-        if (!lastUserMessageRef.current || isLoading) return;
+    const retryLastMessage = useCallback((failedAssistantId?: string) => {
+        if (isLoading) return;
+        if (failedAssistantId) {
+            const retryTurn = getRetryTurn(messages, failedAssistantId);
+            if (!retryTurn) return;
+
+            void sendMessage(retryTurn.content, { retryAssistantId: failedAssistantId });
+            return;
+        }
+
+        if (!lastUserMessageRef.current) return;
         const msg = lastUserMessageRef.current;
         void sendMessage(msg, { appendUser: false, replaceLastError: true });
-    }, [isLoading, sendMessage]);
+    }, [isLoading, messages, sendMessage]);
 
     return (
         <AIChatContext.Provider

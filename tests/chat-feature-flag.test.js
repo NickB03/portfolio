@@ -5,12 +5,14 @@ const test = require("node:test");
 const ts = require("typescript");
 
 const routePath = join(process.cwd(), "src/app/api/chat/route.ts");
+const providerPath = join(process.cwd(), "src/components/ui/ai-chat/ai-chat-provider.tsx");
 
-function loadPostHandler() {
-  const { outputText } = ts.transpileModule(readFileSync(routePath, "utf8"), {
+function loadCommonJsModule(filePath, compilerOptions = {}) {
+  const { outputText } = ts.transpileModule(readFileSync(filePath, "utf8"), {
     compilerOptions: {
       module: ts.ModuleKind.CommonJS,
       target: ts.ScriptTarget.ES2022,
+      ...compilerOptions,
     },
   });
 
@@ -18,7 +20,11 @@ function loadPostHandler() {
   const compile = new Function("require", "module", "exports", outputText);
   compile(require, routeModule, routeModule.exports);
 
-  return routeModule.exports.POST;
+  return routeModule.exports;
+}
+
+function loadPostHandler() {
+  return loadCommonJsModule(routePath).POST;
 }
 
 async function postChat(body) {
@@ -54,6 +60,10 @@ test("chat POST route is gated by the server-only ENABLE_AI_CHAT flag", async ()
 
     process.env.ENABLE_AI_CHAT = "true";
 
+    const malformedJsonResponse = await postChat("{ this is not valid json");
+    assert.equal(malformedJsonResponse.status, 400);
+    assert.equal((await malformedJsonResponse.json()).error, "Malformed JSON");
+
     const invalidMessageResponse = await postChat(JSON.stringify({ message: "" }));
     assert.equal(invalidMessageResponse.status, 400);
     assert.equal((await invalidMessageResponse.json()).error, "Message is required");
@@ -81,4 +91,29 @@ test("chat POST route is gated by the server-only ENABLE_AI_CHAT flag", async ()
       }
     }
   }
+});
+
+test("chat retry resolves the failed turn that was clicked", () => {
+  const { getRetryTurn } = loadCommonJsModule(providerPath, {
+    jsx: ts.JsxEmit.ReactJSX,
+  });
+
+  assert.equal(typeof getRetryTurn, "function");
+
+  const messages = [
+    { id: "user-old", role: "user", content: "old question" },
+    { id: "assistant-old", role: "assistant", content: "old error", isError: true },
+    { id: "user-latest", role: "user", content: "latest question" },
+    { id: "assistant-latest", role: "assistant", content: "latest error", isError: true },
+  ];
+
+  assert.deepEqual(getRetryTurn(messages, "assistant-old"), {
+    content: "old question",
+    historyMessages: [],
+  });
+  assert.deepEqual(getRetryTurn(messages, "assistant-latest"), {
+    content: "latest question",
+    historyMessages: messages.slice(0, 2),
+  });
+  assert.equal(getRetryTurn(messages, "missing-assistant"), null);
 });

@@ -156,7 +156,7 @@ export function AIChatPopup() {
                                     </div>
                                     {message.isError && (
                                         <button
-                                            onClick={retryLastMessage}
+                                            onClick={() => retryLastMessage(message.id)}
                                             className="mt-2.5 flex items-center gap-1.5 rounded-lg border border-chat-border bg-chat-surface px-3 py-1.5 text-sm text-chat-text-secondary transition-all hover:bg-chat-bg hover:text-chat-text active:scale-95"
                                         >
                                             <RotateCcw className="h-3.5 w-3.5" />

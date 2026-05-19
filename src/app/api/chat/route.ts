@@ -333,7 +333,23 @@ export async function POST(request: Request) {
             );
         }
 
-        const { message, history: rawHistory } = await request.json();
+        let requestBody: unknown;
+        try {
+            requestBody = await request.json();
+        } catch {
+            return jsonResponse(
+                {
+                    error: "Malformed JSON",
+                    message: "Please send a valid JSON request body.",
+                },
+                400
+            );
+        }
+
+        const { message, history: rawHistory } =
+            typeof requestBody === "object" && requestBody !== null
+                ? (requestBody as { message?: unknown; history?: unknown })
+                : {};
 
         if (!message || typeof message !== "string") {
             return jsonResponse(
