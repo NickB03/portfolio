@@ -49,64 +49,60 @@ export function ProjectCard({
   description,
   dates,
   tags,
-  link,
   image,
   video,
   links,
   className,
   imageClassName,
 }: Props) {
+  const isExternal = href?.startsWith("http");
+
   return (
     <div
       className={cn(
-        "flex flex-col h-full border border-border rounded-xl overflow-hidden transition-all duration-200 bg-card text-card-foreground",
-        href && "hover:ring-2 cursor-pointer hover:ring-muted",
+        "relative group flex flex-col h-full overflow-hidden rounded-xl border border-border bg-card text-card-foreground transition-all duration-300",
+        href &&
+          "cursor-pointer hover:-translate-y-1 hover:border-foreground/20 hover:shadow-lg hover:shadow-foreground/5 hover:ring-1 hover:ring-foreground/10 active:scale-[0.99] focus-within:border-foreground/30 focus-within:ring-2 focus-within:ring-ring/60",
         className
       )}
     >
-      <div className={cn("relative shrink-0", imageClassName)}>
-        {href ? (
-          <Link
-            href={href}
-            target={href.startsWith("http") ? "_blank" : undefined}
-            rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-            className="block"
-          >
-            {video ? (
-              <video
-                src={video}
-                autoPlay
-                loop
-                muted
-                playsInline
-                className={cn("w-full h-48 object-cover", imageClassName)}
-              />
-            ) : image ? (
-              <ProjectImage src={image} alt={title} className={imageClassName} />
-            ) : (
-              <div className={cn("w-full h-48 bg-muted", imageClassName)} />
+      {href && (
+        <Link
+          href={href}
+          target={isExternal ? "_blank" : undefined}
+          rel={isExternal ? "noopener noreferrer" : undefined}
+          className="absolute inset-0 z-10 rounded-xl focus-visible:outline-none"
+          aria-label={`Open ${title}`}
+        />
+      )}
+
+      <div className={cn("relative shrink-0 overflow-hidden", imageClassName)}>
+        {video ? (
+          <video
+            src={video}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className={cn(
+              "w-full h-48 object-cover transition duration-500 ease-out group-hover:scale-[1.03] group-hover:brightness-105",
+              imageClassName
             )}
-          </Link>
+          />
+        ) : image ? (
+          <ProjectImage
+            src={image}
+            alt={title}
+            className={cn(
+              "transition duration-500 ease-out group-hover:scale-[1.03] group-hover:brightness-105",
+              imageClassName
+            )}
+          />
         ) : (
-          <div className="block">
-            {video ? (
-              <video
-                src={video}
-                autoPlay
-                loop
-                muted
-                playsInline
-                className={cn("w-full h-48 object-cover", imageClassName)}
-              />
-            ) : image ? (
-              <ProjectImage src={image} alt={title} className={imageClassName} />
-            ) : (
-              <div className={cn("w-full h-48 bg-muted", imageClassName)} />
-            )}
-          </div>
+          <div className={cn("w-full h-48 bg-muted", imageClassName)} />
         )}
         {links && links.length > 0 && (
-          <div className="absolute top-2 right-2 flex flex-wrap gap-2">
+          <div className="absolute top-2 right-2 z-30 flex flex-wrap gap-2">
             {links.map((link, idx) => (
               <Link
                 href={link.href}
@@ -134,15 +130,13 @@ export function ProjectCard({
             <time className="text-xs text-muted-foreground">{dates}</time>
           </div>
           {href && (
-            <Link
-              href={href}
-              target={href.startsWith("http") ? "_blank" : undefined}
-              rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-              className="text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
-              aria-label={`Open ${title}`}
+            <span
+              aria-hidden="true"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-background/80 px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors duration-200 group-hover:border-foreground/20 group-hover:text-foreground"
             >
-              <ArrowUpRight className="h-4 w-4" aria-hidden />
-            </Link>
+              View project
+              <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </span>
           )}
         </div>
         <div className="text-xs flex-1 prose max-w-full text-pretty font-sans leading-relaxed text-muted-foreground dark:prose-invert">
