@@ -258,24 +258,16 @@ function MainLayout({ panelConfig }: { panelConfig: PanelConfig }) {
     return panels;
   }, [panelConfig, showLeftPanel, showRightPanel]);
 
-  const [selectedPanel, setSelectedPanel] = useState(() => {
-    const editorPanel = mainPanels.find(panel => panel.title === "UI Editor");
-    return editorPanel || mainPanels[0];
-  });
+  const [selectedPanelTitle, setSelectedPanelTitle] = useState("UI Editor");
 
-  // Update selected panel when panels change
-  useEffect(() => {
+  const selectedPanel = useMemo(() => {
     const editorPanel = mainPanels.find(panel => panel.title === "UI Editor");
-    const currentPanel = mainPanels.find(panel => panel.title === selectedPanel?.title);
-    
-    if (!currentPanel) {
-      setSelectedPanel(editorPanel || mainPanels[0]);
-    }
-  }, [mainPanels, selectedPanel?.title]);
+    return mainPanels.find(panel => panel.title === selectedPanelTitle) || editorPanel || mainPanels[0];
+  }, [mainPanels, selectedPanelTitle]);
 
   const handlePanelClickById = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     const panelIndex = parseInt(e.currentTarget.dataset.panelIndex || "0");
-    setSelectedPanel(mainPanels[panelIndex]);
+    setSelectedPanelTitle(mainPanels[panelIndex]?.title || "UI Editor");
   }, [mainPanels]);
 
   return (

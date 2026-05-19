@@ -80,7 +80,6 @@ export type FieldConfigObject = FieldConfigItem & {
  * For object fields, allow both FieldConfigItem properties (label, description, etc.)
  * AND nested field configs for the object's properties.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for Zod generic inference
 export type FieldConfig<SchemaType extends z.infer<z.ZodObject<any, any>>> = {
   [Key in keyof SchemaType]?: FieldConfigItem | FieldConfigObject;
 };
@@ -92,16 +91,13 @@ export enum DependencyType {
   SETS_OPTIONS,
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for Zod generic inference
 type BaseDependency<SchemaType extends z.infer<z.ZodObject<any, any>>> = {
   sourceField: keyof SchemaType;
   type: DependencyType;
   targetField: keyof SchemaType;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic field value types
   when: (sourceFieldValue: any, targetFieldValue: any) => boolean;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for Zod generic inference
 export type ValueDependency<SchemaType extends z.infer<z.ZodObject<any, any>>> =
   BaseDependency<SchemaType> & {
     type:
@@ -113,7 +109,6 @@ export type ValueDependency<SchemaType extends z.infer<z.ZodObject<any, any>>> =
 export type EnumValues = readonly [string, ...string[]];
 
 export type OptionsDependency<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for Zod generic inference
   SchemaType extends z.infer<z.ZodObject<any, any>>,
 > = BaseDependency<SchemaType> & {
   type: DependencyType.SETS_OPTIONS;
@@ -122,7 +117,6 @@ export type OptionsDependency<
   options: EnumValues;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for Zod generic inference
 export type Dependency<SchemaType extends z.infer<z.ZodObject<any, any>>> =
   | ValueDependency<SchemaType>
   | OptionsDependency<SchemaType>;
@@ -132,12 +126,10 @@ export type Dependency<SchemaType extends z.infer<z.ZodObject<any, any>>> =
  */
 export type AutoFormInputComponentProps = {
   zodInputProps: React.InputHTMLAttributes<HTMLInputElement>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- react-hook-form field name type
   field: ControllerRenderProps<FieldValues, any>;
   fieldConfigItem: FieldConfigItem;
   label: string;
   isRequired: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Dynamic field props from Zod schema
   fieldProps: any;
   zodItem: z.ZodType;
   className?: string;

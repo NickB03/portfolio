@@ -7,8 +7,18 @@ const eslintConfig = defineConfig([
     globalIgnores([
         // Default ignores of eslint-config-next:
         '.next/**',
+        '.content-collections/**',
+        '.open-next/**',
+        '.wrangler/**',
+        '.claude/**',
+        'node_modules/**',
+        'supabase/.branches/**',
+        'supabase/.temp/**',
         'out/**',
         'build/**',
+        '.DS_Store',
+        '**/.DS_Store',
+        'tsconfig.tsbuildinfo',
         'next-env.d.ts',
     ]),
 ])

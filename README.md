@@ -1,4 +1,4 @@
-# nickbohmer.com
+# nickb.net
 
 Personal portfolio and interactive AI-powered website for **Nick Bohmer** — Product Leader & AI Builder based in Dallas, TX.
 
@@ -25,7 +25,7 @@ Built with Next.js 16, React 19, and TypeScript. Features an AI chat assistant p
 | Content | [MDX](https://mdxjs.com) via [content-collections](https://content-collections.dev) |
 | Database | [Supabase](https://supabase.com) (PostgreSQL + pgvector) |
 | AI/Embeddings | Google Gemini API (embeddings + generation) |
-| Deployment | [Cloudflare Pages](https://pages.cloudflare.com) |
+| Deployment | [Cloudflare Workers](https://workers.cloudflare.com) via OpenNext |
 
 ## Project Structure
 
@@ -77,13 +77,14 @@ supabase/                   # Database migrations
    Copy the example env file and fill in your values:
 
    ```bash
-   cp .env.local.example .env.local
+   cp .env.example .env.local
    ```
 
    Required variables:
    - `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anonymous key
    - `SUPABASE_SERVICE_ROLE_KEY` — Supabase service role key
+   - `GEMINI_API_KEY` — Google Gemini API key for embeddings and responses
    - `NEXT_PUBLIC_ENABLE_AI_CHAT` — Set to `true` to enable the AI chat feature
 
 4. **Seed the knowledge base** (optional, for AI chat)
@@ -108,10 +109,16 @@ npm run build
 
 ### Deploy
 
-Configured for Cloudflare Pages. Push to the connected branch to trigger automatic deployment, or deploy manually:
+Configured for Cloudflare Workers through OpenNext. Preview the Worker locally:
 
 ```bash
-npx wrangler pages deploy .next
+npm run preview
+```
+
+Deploy with:
+
+```bash
+npm run deploy
 ```
 
 ## AI Chat Architecture

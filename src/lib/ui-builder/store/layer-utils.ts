@@ -324,7 +324,6 @@ export function migrateV5ToV6(persistedState: unknown): LayerStore {
         // If page has old style but no custom theme, remove the style to use default theme
         if (hasStyle && !hasCustomTheme) {
           console.log("Removing old-format style from page (no custom theme)", { pageId: page.id, pageName: page.name });
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { style: _removedStyle, ...restProps } = page.props;
           return {
             ...page,
@@ -426,9 +425,7 @@ export const moveLayer = (
   targetPosition: number
 ): ComponentLayer[] => {
   let layerToMove: ComponentLayer | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let sourceParentId: string | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let sourcePosition: number = -1;
 
   // Find the layer to move and its current parent
@@ -497,4 +494,3 @@ export const canLayerAcceptChildren = (
 
   return hasChildrenField && hasLayerChildren(layer);
 };
-
