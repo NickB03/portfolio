@@ -113,13 +113,14 @@ export const DATA = {
       dates: "",
       active: true,
       description:
-        "AI research platform with generative UI — a multi-step research agent orchestrates searches across Tavily, Brave, and Exa, then renders results as interactive charts, tables, timelines, and citations.",
+        "Open-source AI platform with a multi-agent architecture (Search, Research, Build) plus a live React canvas that compiles single-file artifacts in-browser. Multi-provider model routing via Vercel AI Gateway, instrumented with Arize Phoenix for LLM observability and continuous evaluation.",
       technologies: [
         "Next.js",
-        "React",
-        "AI SDK",
+        "TypeScript",
+        "Multi-Agent",
         "Generative UI",
-        "Drizzle",
+        "Vercel AI Gateway",
+        "Arize Phoenix",
         "Supabase",
       ],
       links: [],
