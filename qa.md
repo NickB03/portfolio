@@ -1,29 +1,27 @@
-ask me 1 question at a time when I answer you simply move on to the next question
-Ok let's make it easier to start. focus on simple questions that can be used to seed the kb
-Nicholas Bohmer. I go by Nick and only my little sister is allowed to call me Nickey
-Dallas, TX (Far North Dallas)
-Don't ask me questions that are easily found in my resume
-3D printing - I particularly enjoy making replica props from movies, games, tv shows. I appreciate how you need to hone multiple skills to make one prop. 3D printing (resin or PLA) requires tons of tweaking and perfecting to learn how to do it then how to do it right. From there you have to learn how to sand, prime, paint, do details, aging and weathering, etc. There's also the science behind it if I'm building a replica of the Scarlet Witch crown from Doctor Strange and the Multiverse of Madness  you have to test dozens of resin mixes to get the perfect mix of strength and flexibility. --- Hobby 2 is building AI projects. I'm starting to drive my wife crazy now that I carry my MacBook around all the time so I can keep Claude Code working in the background. 3. Movies - I love going to the movie theater sitting in the center seat middle row and getting engrossed in whats happening on screen for a short period of time. It's one of the few places I can easily disconnect from the world.
-Married my wife's name is Erica. As of now (Jan 2026) we have been married 20 years.  I have a 17yr old daughter that's preparing to go off to college and a 6 year old who is taking up my love for reading and video games.  We started playing Fortnite together over Christmas break and he's surprisingly good. Also, he thinks I'm the best Fortnite player in the world so that's a nice ego boost. I have two dogs Charlie a long hair dapple mini dachshund and Mischa a collie mix rescue. My mother Carole lives with my family 
-Quiet coffee in the morning relax working on a project or listening to an audio book (yes it counts as reading) before getting in a workout. Going out to breakfast after with my family and getting pancakes that are basically dessert for breakfast. Going on a hike after that (even better if I'm in the mountains) but nothing too hard. Going home to relax with an easy dinner then play cards together. After we stout by the campfire it's a little chilly so the fire warms you while you make smores. I finish it by reading my son a chapter from a book then spend the evening hanging with my best friend watching a show or listening to music. Oh at some point in the day there will also probably have been a Taylor swift family dance party.
-"problem solver", always there to help, hard working, "contemplative" , quick at making decisions, always moving. also probably restless and antsy 
-Snacking at work. I'm terrible about eating when I'm working. When I started getting in better shape I started always having snacks around. My co-workers know I always have some type of protein snack that's high in fiber nearby. My current favorites on hand are, barbells protein bars, Catalina crunch cereal (blueberry), dry roasted edamame, greek yogurt with honey & protein "cookie butter" -- also I probably drink too much coffee and I always have a water bottle with me
-Sci-fi & epic fantasy for books followed by mysteriy thrillers. Favorite author of all time is Brandon Sanderson (mist born, way of kings, anything cosmere), John Scalzi, Ernest cline, Dennis e. Taylor (bobiverse #2 favorite series), anne mccaffrey (dragon riders of pern) George R. R. Martin plus dozens of others. I particularly love audio books and my favorite narrator is Ray Porter. My favorite TV show is It's Always sunny in Philadelphia 
-I'm all over the board with music from alternative, emo, pop, rock & rap. Favorite artists are Taylor swift - I'm an unashamed swifty because of my wife. Foo fighters, Taking Back Sunday, Brand New, Post Malone, Chris Stapleton
-Anytime you are about to ask - see if you can find the answer yourself.  Always be willing to help (and teach)- Just because I am the type to go find the answer doesn't mean that's natural for everyone. -- Always consider where the other person is coming from or where there motives lie. It's amazing how often we jump to the worst conclusion but when you listen to the voice of reason you often realize there are always reasons you didn't think of why someone did something. Stand up for what you believe never be afraid to share your thoughts and opinions but always be prepared to listen and hear others
-hands on I normally move quickly from research to hands on. I learn things by trying and failing over and over again always getting better. I like taking things apart to understand how they work and put them back together. I'd rather spend half a day taking apart my refrigerator figuring out how to replace a condenser motor that's not documented anywhere than have someone come out and do it.
-skip
-Night owl for sure
-Silence (noise cancelling headphones on with no music) or just a Spotify playlist that has all kinds of things on it. I found I like listening to broadway show tunes while I work.
-I want to travel to Ireland, Germany & see (and photograph) the Northern lights from Norway. Photography was a hobby I forgot earlier
-people & events. With people I love catching candid moments. One of my favorite things is taking a great picture of someone I care about (family, friend) knowing that they will appreciate it. Seeing it on their profile pictures. Taking vacation pictures with extended family and seeing them all post memories that are the photos I took. I love taking concert photos. I use a Sony FX VII alpha, Sony a7r ii (love my not too expensive tamron 20-200) 
-video / cinematography -  from handhelds to drones. I love the amount of time and effort to make a perfect 30 second video. My favorite I made was doing a wedding video for my mother in law
-All of the above? 
-skip
-Play a video game or work on a project 
-Mostly first person shooters starting with half-life counter-strike, overwatch, pubg & because of my son - Fortnite (zero build) -- for old school it would be FF7 & Zelda 
-Mac but always have a good windows PC for gaming
-audiobooks but I love to own physical books. My biggest wish is they would just sell the audiobook and ebook together
-Pee. Did you expect a different answer? After that start my coffee normally a double amiercano (light roasted beans from Guatemala) from my Phillips 3200 or a pour over if I have the time
-Mischa is a ball of anxiety but the sweetest dog in the world. Charlie is a stubborn stereotypical dachshund who loves to bury himself under covers or blankets
-If I'm being honest it's office or garage so I can focus. But I mostly try to setup where I can work and be with the family while we hang out
+# Public Portfolio Q&A Notes
+
+These notes are public-safe source material for portfolio assistant content. Keep answers broad enough for a public website and public repository.
+
+## Identity
+
+Nick Bohmer is a Dallas-area product leader and hands-on builder focused on enterprise networking, security, and AI-enabled product development.
+
+## Interests
+
+Nick enjoys 3D printing, prop making, photography, movies, reading, gaming, and building AI projects. He is drawn to hobbies that reward iteration, craft, and technical problem solving.
+
+## Work Style
+
+Nick learns by building. He moves quickly from research to hands-on experimentation, uses prototypes to test ideas, and likes taking things apart to understand how they work.
+
+## Values
+
+Nick values self-directed learning, clear thinking, and helping others. He prefers to investigate first, share what he learns, and stay open to better explanations when new evidence appears.
+
+## Creative Work
+
+Nick enjoys photography and video because they combine planning, timing, technical execution, and polish. He likes capturing candid moments and building finished artifacts that other people can use or enjoy.
+
+## Reset
+
+When Nick needs to reset, he usually spends time on a project, reads, watches a movie, plays a game, or gets outside.

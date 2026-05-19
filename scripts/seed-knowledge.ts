@@ -1,10 +1,11 @@
 /**
  * Seed Knowledge Base Script
  *
- * This script extracts content from resume data AND personal knowledge,
+ * This script extracts public-safe portfolio knowledge,
  * chunks it, generates embeddings via Gemini, and stores in Supabase pgvector.
  *
  * Usage: npx tsx scripts/seed-knowledge.ts
+ * Set INCLUDE_PERSONAL_KNOWLEDGE=true to include nick-info.md chunks locally.
  */
 
 import { createClient } from "@supabase/supabase-js";
@@ -18,7 +19,7 @@ config({ path: ".env.local" });
 // Resume data - written in conversational first-person voice for natural AI responses
 const RESUME_CHUNKS = [
     {
-        content: `I'm a product leader and hands-on builder. My professional focus has been bridging enterprise strategy and execution, particularly around managed SD-WAN and SASE solutions. Over the past year I've also taught myself to design, build, and launch full-stack AI applications — taking ideas from prototype to production with modern dev workflows and CI/CD pipelines. Working hands-on with multi-agent frameworks like Google's Agent Development Kit gave me real insight into the strengths and limitations of AI systems, which helps me collaborate better with engineering teams and make product decisions grounded in actual implementation challenges.`,
+        content: `I'm a product leader and hands-on builder focused on enterprise networking, security, and AI-enabled product development. I bridge strategy and execution across product vision, go-to-market planning, pricing and packaging, and cross-functional delivery. I also build AI applications hands-on, taking ideas from prototype to production so product decisions stay grounded in real implementation challenges.`,
         metadata: {
             source: "resume",
             type: "summary" as const,
@@ -26,29 +27,29 @@ const RESUME_CHUNKS = [
         },
     },
     {
-        content: `Since August 2025 I've been an Associate Director at AT&T leading Value Added Solutions. I run a major product portfolio that includes the Global Solution Center and Network Function Virtualization, working closely with executives to align roadmaps with business strategy. I also directed the end-to-end development of an AI-powered platform built with Next.js, React, and Python — took it through the full lifecycle and it significantly improved the seller experience. I've been driving LLM workflow integrations using LangSmith to push AI adoption, and I was selected for AT&T's Growth Council to lead AI-focused product evolution for business networks.`,
+        content: `Since August 2025 I've been an Associate Director at AT&T focused on enterprise networking and security offerings. I lead product strategy and execution, align roadmap priorities across product, engineering, sales, and leadership stakeholders, and shape managed security and SASE/SSE portfolio direction. I also directed development of an AI-enabled workflow platform, drive practical LLM adoption, and participate in company growth work focused on AI for business networking and security products.`,
         metadata: {
             source: "resume",
             type: "work" as const,
-            title: "Associate Director (Value Added Solutions)",
+            title: "Associate Director, Product Management",
             company: "AT&T",
             period: "August 2025 - Current",
-            topics: ["at&t", "leadership", "ai", "product-management", "next.js", "langsmith"],
+            topics: ["at&t", "leadership", "ai", "product-management"],
         },
     },
     {
-        content: `From August 2022 to August 2025 I led Product Management & Development for AT&T's Edge Solutions. The big thing during this stretch was taking a network-integrated SD-WAN solution from concept all the way to market launch — managing a significant budget and cross-functional teams to deploy a large device fleet. I built out the GTM strategies and customer-facing collateral to position the Edge solutions. One of the highlights was earning "Market Leader" recognition from top industry analysts like Frost & Sullivan and Vertical Systems Group.`,
+        content: `From August 2022 to August 2025 I led Product Management & Development for AT&T. I took a network-integrated SD-WAN solution from concept to market launch, coordinated roadmap and cross-functional delivery, and built GTM strategy and customer-facing collateral. I also led analyst-relations and market-positioning work for managed networking and security offers, contributing to sustained external recognition.`,
         metadata: {
             source: "resume",
             type: "work" as const,
-            title: "Lead Product Management & Development (Edge Solutions)",
+            title: "Lead Product Management & Development",
             company: "AT&T",
             period: "August 2022 - August 2025",
             topics: ["at&t", "sd-wan", "product-launch", "gtm", "analyst-relations"],
         },
     },
     {
-        content: `Before leading product, I was a Solutions Architect at AT&T from August 2020 to July 2022. I designed tailored network and security solutions — SD-WAN, SASE — for global enterprise clients and drove significant product adoption. I managed executive-level relationships that generated substantial annual revenue, basically serving as a trusted advisor on network transformation. A lot of the role was orchestrating collaboration between engineering, marketing, and sales to keep solutions aligned with the strategic vision.`,
+        content: `Before leading product, I was a Solutions Architect at AT&T from August 2020 to July 2022. I designed tailored network and security solutions for global enterprise clients, drove product adoption, advised executive sponsors across strategic accounts, and orchestrated collaboration between engineering, marketing, and sales.`,
         metadata: {
             source: "resume",
             type: "work" as const,
@@ -59,11 +60,11 @@ const RESUME_CHUNKS = [
         },
     },
     {
-        content: `My first role in the SD-WAN space was as a Sr. Edge Solutions Specialist at AT&T from January 2019 to July 2020. I was a key driver in launching the Edge Specialist team and increasing service adoption by positioning SD-WAN and security solutions effectively. I led over 20 SD-WAN workshops where I translated technical concepts for stakeholders, which directly generated significant new revenue. I also created and delivered specialized technical training for sales teams to build their expertise in Managed Network Services.`,
+        content: `My first role in the SD-WAN space was as a Sr. Edge Solutions Specialist at AT&T from January 2019 to July 2020. I helped launch the Edge Specialist team, increased service adoption by positioning SD-WAN and security solutions effectively, led more than 20 workshops for stakeholders, and created technical training for sales teams.`,
         metadata: {
             source: "resume",
             type: "work" as const,
-            title: "Sr. Edge Solutions Specialist (SD-WAN & MNS SME)",
+            title: "Sr. Edge Solutions Specialist",
             company: "AT&T",
             period: "January 2019 - July 2020",
             topics: ["at&t", "sd-wan", "training", "workshops", "sales-enablement"],
@@ -123,23 +124,23 @@ interface KnowledgeChunk {
 // Map section titles to type and topics for richer metadata
 const SECTION_METADATA: Record<string, { type: KnowledgeChunk["metadata"]["type"]; topics: string[] }> = {
     "core identity": { type: "personal", topics: ["name", "location", "identity"] },
-    "family & home life": { type: "family", topics: ["family", "wife", "kids", "dogs", "home"] },
+    "family & home life": { type: "family", topics: ["family", "home"] },
     "hobbies & interests": { type: "hobbies", topics: ["hobbies"] },
     "hobbies & interests > 3d printing & prop making": { type: "hobbies", topics: ["3d-printing", "props", "crafting", "painting"] },
     "hobbies & interests > building ai projects": { type: "hobbies", topics: ["ai-projects", "side-projects", "building"] },
     "hobbies & interests > movies": { type: "hobbies", topics: ["movies", "theater", "entertainment"] },
     "photography & video": { type: "hobbies", topics: ["photography", "video", "cinematography", "cameras", "creative"] },
-    "photography & video > photography": { type: "hobbies", topics: ["photography", "cameras", "sony", "candid", "concerts"] },
+    "photography & video > photography": { type: "hobbies", topics: ["photography", "cameras", "candid", "concerts"] },
     "photography & video > video & cinematography": { type: "hobbies", topics: ["video", "cinematography", "drones", "weddings"] },
     "personality": { type: "values", topics: ["personality", "traits", "character"] },
     "habits & quirks": { type: "preferences", topics: ["habits"] },
-    "habits & quirks > work snacking": { type: "preferences", topics: ["snacks", "food", "protein", "coffee", "health"] },
+    "habits & quirks > work snacking": { type: "preferences", topics: ["snacks", "food", "coffee", "health"] },
     "habits & quirks > morning routine": { type: "preferences", topics: ["morning-routine", "coffee", "daily-habits"] },
     "books, tv & music": { type: "hobbies", topics: ["entertainment"] },
-    "books, tv & music > books": { type: "hobbies", topics: ["books", "reading", "audiobooks", "brandon-sanderson", "sci-fi", "fantasy"] },
-    "books, tv & music > tv": { type: "hobbies", topics: ["tv", "always-sunny"] },
-    "books, tv & music > music": { type: "hobbies", topics: ["music", "taylor-swift", "spotify", "broadway"] },
-    "gaming": { type: "hobbies", topics: ["gaming", "video-games", "fortnite", "fps"] },
+    "books, tv & music > books": { type: "hobbies", topics: ["books", "reading", "audiobooks", "sci-fi", "fantasy"] },
+    "books, tv & music > tv": { type: "hobbies", topics: ["tv"] },
+    "books, tv & music > music": { type: "hobbies", topics: ["music"] },
+    "gaming": { type: "hobbies", topics: ["gaming", "video-games"] },
     "values & principles": { type: "values", topics: ["values", "principles", "philosophy", "beliefs"] },
     "how i learn": { type: "values", topics: ["learning", "hands-on", "style"] },
     "perfect weekend": { type: "preferences", topics: ["weekend", "family", "outdoors", "routine", "ideal-day"] },
@@ -299,9 +300,17 @@ async function main() {
     const resumeChunks = createChunks();
     console.log(`   ✓ Created ${resumeChunks.length} chunks from resume\n`);
 
-    // Create chunks from personal knowledge
-    console.log("📚 Parsing personal knowledge from nick-info.md...");
-    const personalChunks = parsePersonalKnowledge();
+    // Create chunks from personal knowledge only when explicitly enabled. The
+    // default seed path is public-safe resume/project content.
+    const includePersonalKnowledge = process.env.INCLUDE_PERSONAL_KNOWLEDGE === "true";
+    let personalChunks: KnowledgeChunk[] = [];
+
+    if (includePersonalKnowledge) {
+        console.log("📚 Parsing personal knowledge from nick-info.md...");
+        personalChunks = parsePersonalKnowledge();
+    } else {
+        console.log("📚 Skipping personal knowledge from nick-info.md (set INCLUDE_PERSONAL_KNOWLEDGE=true to include it)");
+    }
 
     // Combine all chunks
     const chunks = [...resumeChunks, ...personalChunks];

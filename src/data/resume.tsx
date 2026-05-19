@@ -21,7 +21,7 @@ export const DATA = {
   description:
     "",
   summary:
-    "Product leader and hands-on builder bridging enterprise strategy and execution across network and security portfolios, including managed SASE/SSE, secure SD-WAN, firewall, IDS/IPS, and Zero Trust architectures. I own multi-year product vision, pricing and packaging, and revenue accountability at portfolio scale, and I partner deeply with engineering, sales, marketing, and customer success.\n\nI build AI applications hands-on (Polymorph, AnalystAI, multi-agent platforms) to pressure-test capability, inform product strategy, and accelerate time-to-market for network and security offers. Working through multi-agent frameworks gives me firsthand insight into the strengths and limits of modern AI systems.\n\nThat perspective lets me collaborate more effectively with engineering teams, drive product decisions grounded in real implementation challenges, and push the boundaries of what's possible in AI-driven enterprise products.",
+    "Product leader and hands-on builder focused on enterprise networking, security, and AI-enabled product development. I bridge strategy and execution across product vision, go-to-market planning, pricing and packaging, and cross-functional delivery.\n\nI build AI applications hands-on (Polymorph, AnalystAI, multi-agent platforms) to pressure-test capability, inform product strategy, and accelerate practical experimentation. Working through multi-agent frameworks gives me firsthand insight into the strengths and limits of modern AI systems.\n\nThat perspective helps me collaborate more effectively with engineering teams, drive product decisions grounded in real implementation challenges, and push the boundaries of what's possible in AI-driven enterprise products.",
   avatarUrl: "/me.jpg",
   competencies: [],
   skills: [],
@@ -61,24 +61,24 @@ export const DATA = {
       href: "https://att.com",
       badges: [],
       location: "Dallas, TX",
-      title: "Associate Director (Value Added Solutions)",
+      title: "Associate Director, Product Management",
       logoUrl: "/globe.png",
       start: "August 2025",
       end: "Current",
       description:
-        "• Lead AT&T's $400M network security and edge portfolio (Global Solution Center, Network Function Virtualization, Product Showcase), partnering with VP+ leadership on multi-year strategy spanning managed SASE/SSE, secure SD-WAN, firewall, IDS/IPS, and Zero Trust.\n• Product leader on AT&T Dynamic Defense with Palo Alto Networks, a network-integrated SASE offer combining Prisma Access with AT&T network and threat-intelligence capabilities for enterprise customers.\n• Led packaging and pricing redesign for managed security offers, restructuring how SASE/SSE bundles with connectivity to lift attach and sharpen competitive position.\n• Directed end-to-end development of a modern AI-powered platform (Next.js, React, Python) that materially improved seller experience.\n• Spearheaded LLM workflow integrations (LangSmith) to drive AI adoption across Value-Added Solutions.\n• Selected for AT&T Growth Council to lead AI-focused product evolution initiatives for business networking and security.",
+        "• Lead product strategy and execution for enterprise networking and security offerings, aligning roadmap priorities across product, engineering, sales, and leadership stakeholders.\n• Shape managed security and SASE/SSE portfolio direction, translating customer needs and market signals into clearer packaging, positioning, and launch plans.\n• Led packaging and pricing improvements for managed security offers, improving offer clarity and competitive positioning.\n• Directed development of an AI-enabled workflow platform that improved stakeholder workflows and accelerated decision-making.\n• Drive practical AI adoption through LLM workflow integrations, prototypes, and product enablement.\n• Selected for a company growth initiative focused on applying AI to business networking and security products.",
     },
     {
       company: "AT&T",
       href: "https://att.com",
       badges: [],
       location: "Dallas, TX",
-      title: "Lead Product Management & Development (Edge Solutions)",
+      title: "Lead Product Management & Development",
       logoUrl: "/globe.png",
       start: "August 2022",
       end: "August 2025",
       description:
-        "• Took network-integrated SD-WAN solution from concept to market launch, managing significant budget and cross-functional teams to deploy an extensive device fleet.\n• Developed comprehensive GTM strategies and customer-facing collateral to position Edge solutions effectively and ensure consistent messaging.\n• Own AT&T's analyst response motion for SD-WAN, SASE, Managed Services, and NaaS, leading annual submissions including the Managed Network Services Magic Quadrant and quarterly briefings to pitch roadmap and shape industry positioning. Sustained Leader recognition from Gartner, Frost & Sullivan, and Vertical Systems Group.",
+        "• Took a network-integrated SD-WAN solution from concept to market launch, coordinating roadmap and cross-functional delivery.\n• Developed GTM strategies and customer-facing collateral to position edge networking solutions effectively and ensure consistent messaging.\n• Led analyst-relations and market-positioning work for managed networking and security offers, contributing to sustained external recognition.",
     },
     {
       company: "AT&T",
@@ -90,19 +90,19 @@ export const DATA = {
       start: "August 2020",
       end: "July 2022",
       description:
-        "• Designed tailored network and security solutions (SD-WAN, SASE) for global enterprise clients, driving significant product adoption.\n• Trusted advisor to executive sponsors across an account portfolio generating substantial annual revenue, serving as a sounding board on network transformation.\n• Orchestrated collaboration between engineering, marketing, and sales to ensure solutions aligned with strategic vision.",
+        "• Designed tailored network and security solutions (SD-WAN, SASE) for global enterprise clients, driving product adoption.\n• Trusted advisor to executive sponsors across strategic accounts, serving as a sounding board on network transformation.\n• Orchestrated collaboration between engineering, marketing, and sales to ensure solutions aligned with strategic vision.",
     },
     {
       company: "AT&T",
       href: "https://att.com",
       badges: [],
       location: "Dallas, TX",
-      title: "Sr. Edge Solutions Specialist (SD-WAN & MNS SME)",
+      title: "Sr. Edge Solutions Specialist",
       logoUrl: "/globe.png",
       start: "January 2019",
       end: "July 2020",
       description:
-        "• Key driver in launching the Edge Specialist team, increasing service adoption by effectively positioning SD-WAN and security solutions.\n• Led 20+ SD-WAN workshops translating technical concepts for stakeholders, directly generating significant new revenue.\n• Created and delivered specialized technical training for sales teams to enhance expertise in Managed Network Services.",
+        "• Key driver in launching the Edge Specialist team, increasing service adoption by effectively positioning SD-WAN and security solutions.\n• Led 20+ SD-WAN workshops translating technical concepts for stakeholders and supporting new revenue opportunities.\n• Created and delivered specialized technical training for sales teams to enhance expertise in Managed Network Services.",
     },
   ],
   education: [],
