@@ -76,7 +76,7 @@ Focused tests use Node's built-in test runner.
 
 ## Environment Variables
 
-Required in `.env.local` (see `.env.local.example`):
+Required in `.env.local` (see `.env.example`):
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - `GEMINI_API_KEY` (for AI chat)
 - `ENABLE_AI_CHAT` (server endpoint flag), `NEXT_PUBLIC_ENABLE_AI_CHAT` (client UI flag)
