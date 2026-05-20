@@ -19,6 +19,8 @@ function loadProjectCard() {
   });
 
   const loadedModule = { exports: {} };
+  // This lightweight harness compiles project-owned source read from disk; if the
+  // test surface grows, move this to a standard React test/bundler setup.
   const compile = new Function("require", "loadedModule", "exports", outputText);
   const localRequire = (id) => {
     if (id === "@/components/ui/badge") {
