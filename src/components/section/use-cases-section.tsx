@@ -15,7 +15,7 @@ export default function UseCasesSection() {
 
                         />
                         <div className="border bg-primary z-10 rounded-xl px-4 py-1">
-                            <span className="text-background text-sm font-medium">Use Cases</span>
+                            <span className="text-background text-sm font-medium">Case Studies</span>
                         </div>
                         <div
                             className="flex-1 h-px bg-linear-to-l from-transparent from-5% via-border via-95% to-transparent"
@@ -23,9 +23,9 @@ export default function UseCasesSection() {
                         />
                     </div>
                     <div className="flex flex-col gap-y-3 items-center justify-center">
-                        <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">Business Solutions</h2>
+                        <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">How I work, end to end</h2>
                         <p className="text-muted-foreground md:text-lg/relaxed lg:text-base/relaxed xl:text-lg/relaxed text-balance text-center">
-                            Real-world applications and automation solutions driving value.
+                            Selected enterprise problems I framed, prototyped, funded, and shipped — the PM craft behind the resume bullets.
                         </p>
                     </div>
                 </div>
