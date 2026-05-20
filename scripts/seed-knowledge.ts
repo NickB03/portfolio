@@ -71,7 +71,7 @@ const RESUME_CHUNKS = [
         },
     },
     {
-        content: `One of my main side projects is vana.bot — a full-stack AI chat application I built that renders interactive artifacts like React components, SVG graphics, and Mermaid diagrams live in the browser. It's built with React, TypeScript, and Vite on the frontend, uses OpenRouter for LLM access, and has a Supabase/PostgreSQL backend running on Deno. You can check it out at https://vana.bot. It's a good example of me taking an AI idea all the way to a shipped, production application.`,
+        content: `One of my main side projects is vana.bot — a full-stack AI chat application I built that renders interactive artifacts like React components, SVG graphics, and Mermaid diagrams live in the browser. It's built with React, TypeScript, and Vite on the frontend, uses OpenRouter for LLM access, and has a Supabase/PostgreSQL backend running on Deno. You can check it out at https://vana.bot. It is a shipped full-stack AI project that reflects how I turn AI capabilities into usable product experiences.`,
         metadata: {
             source: "resume",
             type: "project" as const,
