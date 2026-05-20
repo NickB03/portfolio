@@ -62,20 +62,10 @@ export function ProjectCard({
       className={cn(
         "relative group flex flex-col h-full overflow-hidden rounded-xl border border-border bg-card text-card-foreground transition-all duration-300",
         href &&
-          "cursor-pointer hover:-translate-y-1 hover:border-foreground/20 hover:shadow-lg hover:shadow-foreground/5 hover:ring-1 hover:ring-foreground/10 active:scale-[0.99] focus-within:border-foreground/30 focus-within:ring-2 focus-within:ring-ring/60",
+          "cursor-pointer motion-safe:hover:-translate-y-1 hover:border-foreground/20 hover:shadow-lg hover:shadow-foreground/5 hover:ring-1 hover:ring-foreground/10 motion-safe:active:scale-[0.99] focus-within:border-foreground/30 focus-within:ring-2 focus-within:ring-ring/60",
         className
       )}
     >
-      {href && (
-        <Link
-          href={href}
-          target={isExternal ? "_blank" : undefined}
-          rel={isExternal ? "noopener noreferrer" : undefined}
-          className="absolute inset-0 z-10 rounded-xl focus-visible:outline-none"
-          aria-label={`Open ${title}`}
-        />
-      )}
-
       <div className={cn("relative shrink-0 overflow-hidden", imageClassName)}>
         {video ? (
           <video
@@ -85,7 +75,7 @@ export function ProjectCard({
             muted
             playsInline
             className={cn(
-              "w-full h-48 object-cover transition duration-500 ease-out group-hover:scale-[1.03] group-hover:brightness-105",
+              "w-full h-48 object-cover transition duration-500 ease-out motion-safe:group-hover:scale-[1.03] group-hover:brightness-105",
               imageClassName
             )}
           />
@@ -94,7 +84,7 @@ export function ProjectCard({
             src={image}
             alt={title}
             className={cn(
-              "transition duration-500 ease-out group-hover:scale-[1.03] group-hover:brightness-105",
+              "transition duration-500 ease-out motion-safe:group-hover:scale-[1.03] group-hover:brightness-105",
               imageClassName
             )}
           />
@@ -102,17 +92,17 @@ export function ProjectCard({
           <div className={cn("w-full h-48 bg-muted", imageClassName)} />
         )}
         {links && links.length > 0 && (
-          <div className="absolute top-2 right-2 z-30 flex flex-wrap gap-2">
+          <div className="absolute top-2 right-2 z-20 flex flex-wrap gap-2">
             {links.map((link, idx) => (
               <Link
                 href={link.href}
                 key={idx}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
+                className="relative z-20"
               >
                 <Badge
-                  className="flex items-center gap-1.5 text-xs bg-black text-white hover:bg-black/90"
+                  className="flex items-center gap-1.5 text-xs bg-foreground text-background hover:bg-foreground/90"
                   variant="default"
                 >
                   {link.icon}
@@ -124,19 +114,22 @@ export function ProjectCard({
         )}
       </div>
       <div className="p-6 flex flex-col gap-3 flex-1">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex flex-col gap-1">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="min-w-0 flex flex-col gap-1">
             <h3 className="font-semibold">{title}</h3>
             <time className="text-xs text-muted-foreground">{dates}</time>
           </div>
           {href && (
-            <span
-              aria-hidden="true"
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-background/80 px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors duration-200 group-hover:border-foreground/20 group-hover:text-foreground"
+            <Link
+              href={href}
+              target={isExternal ? "_blank" : undefined}
+              rel={isExternal ? "noopener noreferrer" : undefined}
+              aria-label={`Open ${title}`}
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-background/80 px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors duration-200 after:absolute after:inset-0 after:z-10 after:rounded-xl after:content-[''] hover:border-foreground/20 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card group-hover:border-foreground/20 group-hover:text-foreground"
             >
               View project
-              <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            </span>
+              <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-200 motion-safe:group-hover:-translate-y-0.5 motion-safe:group-hover:translate-x-0.5" />
+            </Link>
           )}
         </div>
         <div className="text-xs flex-1 prose max-w-full text-pretty font-sans leading-relaxed text-muted-foreground dark:prose-invert">

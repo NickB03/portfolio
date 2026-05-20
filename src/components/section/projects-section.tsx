@@ -11,7 +11,6 @@ import useEmblaCarousel, {
 type EmblaApi = UseEmblaCarouselType[1];
 
 const projects = DATA.projects;
-const slides = [...projects, ...projects];
 const POLYMORPH_PROJECT_INDEX = Math.max(
   projects.findIndex((project) => project.title === "polymorph"),
   0
@@ -156,9 +155,9 @@ export default function ProjectsSection() {
       </div>
 
       <div className="relative max-w-[900px] mx-auto w-full px-12">
-        <div ref={emblaRef} className="overflow-hidden">
+        <div ref={emblaRef} className="overflow-hidden py-3 -my-3">
           <div className="flex -ml-4">
-            {slides.map((project, i) => (
+            {projects.map((project, i) => (
               <div
                 key={`${project.title}-${i}`}
                 className="pl-4 flex-[0_0_85%] sm:flex-[0_0_70%] min-w-0"
