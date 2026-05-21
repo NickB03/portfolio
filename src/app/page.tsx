@@ -41,9 +41,9 @@ export default function Page() {
                 text={DATA.name}
               />
               <BlurFadeText
-                className="text-muted-foreground md:text-lg lg:text-xl"
+                className="text-balance text-muted-foreground md:text-lg lg:text-xl"
                 delay={BLUR_FADE_DELAY}
-                text="Product Management Leader · Network Security & AI"
+                text={"Product Management Leader · Network Security & AI"}
               />
 
             </div>
