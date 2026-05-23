@@ -122,6 +122,8 @@ Deploy with:
 npm run deploy
 ```
 
+The non-secret Worker flags live in `wrangler.json`. Keep `SUPABASE_SERVICE_ROLE_KEY` and `GEMINI_API_KEY` configured as Cloudflare Worker secrets before deploying.
+
 ## AI Chat Architecture
 
 The AI chat assistant uses a RAG pipeline:

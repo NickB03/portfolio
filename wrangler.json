@@ -11,6 +11,11 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "vars": {
+    "ENABLE_AI_CHAT": "true",
+    "NEXT_PUBLIC_ENABLE_AI_CHAT": "true",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://mrwwzeclxfyaxjygujum.supabase.co"
+  },
   "observability": {
     "enabled": false,
     "head_sampling_rate": 1,
