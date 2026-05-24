@@ -120,6 +120,36 @@ test("chat retry resolves the failed turn that was clicked", () => {
   assert.equal(getRetryTurn(messages, "missing-assistant"), null);
 });
 
+test("chat stream timeout preserves assistant text that already rendered", () => {
+  const { getAssistantFailureState } = loadCommonJsModule(providerPath, {
+    jsx: ts.JsxEmit.ReactJSX,
+  });
+
+  assert.equal(typeof getAssistantFailureState, "function");
+
+  assert.deepEqual(
+    getAssistantFailureState(
+      new DOMException("The operation was aborted.", "AbortError"),
+      "Nick works on AI product experiences."
+    ),
+    {
+      content: "Nick works on AI product experiences.",
+      isError: false,
+    }
+  );
+
+  assert.deepEqual(
+    getAssistantFailureState(
+      new DOMException("The operation was aborted.", "AbortError"),
+      ""
+    ),
+    {
+      content: "Request timed out. Please check your connection and try again.",
+      isError: true,
+    }
+  );
+});
+
 test("chat rate limiting only uses trusted Cloudflare client identity", async () => {
   const postHandler = loadPostHandler();
   const originalEnv = {
