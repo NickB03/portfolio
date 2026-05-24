@@ -90,6 +90,36 @@ interface AIChatProviderProps {
 const CONNECTION_TIMEOUT_MS = 60_000; // Time allowed for initial connection (embedding + search + API call)
 const STREAM_CHUNK_TIMEOUT_MS = 15_000; // Max time between streamed chunks before considering it stalled
 
+function isAbortError(error: unknown): boolean {
+    return (
+        typeof error === "object" &&
+        error !== null &&
+        "name" in error &&
+        error.name === "AbortError"
+    );
+}
+
+export function getAssistantFailureState(
+    error: unknown,
+    streamedContent: string
+): Pick<Message, "content" | "isError"> {
+    const isTimeout = isAbortError(error);
+
+    if (isTimeout && streamedContent.trim().length > 0) {
+        return {
+            content: streamedContent,
+            isError: false,
+        };
+    }
+
+    return {
+        content: isTimeout
+            ? "Request timed out. Please check your connection and try again."
+            : "Sorry, I couldn't process your request. Please try again.",
+        isError: true,
+    };
+}
+
 export function AIChatProvider({ children }: AIChatProviderProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -177,6 +207,7 @@ export function AIChatProvider({ children }: AIChatProviderProps) {
         // Connection timeout: covers embedding, vector search, and Gemini API setup
         const connectionTimeoutId = setTimeout(() => controller.abort(), CONNECTION_TIMEOUT_MS);
         let chunkTimeoutId: ReturnType<typeof setTimeout> | undefined;
+        let accumulatedContent = "";
 
         try {
             const response = await fetch("/api/chat", {
@@ -242,7 +273,6 @@ export function AIChatProvider({ children }: AIChatProviderProps) {
             if (!reader) throw new Error("No response body");
 
             const decoder = new TextDecoder();
-            let accumulatedContent = "";
 
             // Per-chunk idle timeout: detects stalled streams
             const resetChunkTimeout = () => {
@@ -286,18 +316,17 @@ export function AIChatProvider({ children }: AIChatProviderProps) {
                 );
             }
         } catch (error) {
-            console.error("Chat error:", error);
+            const failureState = getAssistantFailureState(error, accumulatedContent);
+            if (failureState.isError) {
+                console.error("Chat error:", error);
+            }
 
-            const isTimeout = error instanceof DOMException && error.name === "AbortError";
             setMessages((prev) =>
                 prev.map((msg) =>
                     msg.id === assistantId
                         ? {
                             ...msg,
-                            content: isTimeout
-                                ? "Request timed out. Please check your connection and try again."
-                                : "Sorry, I couldn't process your request. Please try again.",
-                            isError: true,
+                            ...failureState,
                         }
                         : msg
                 )
