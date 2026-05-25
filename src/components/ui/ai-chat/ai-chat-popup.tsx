@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import Markdown from "react-markdown";
 import { SiriOrb } from "./siri-orb";
 import { cn } from "@/lib/utils";
+import { getActiveChatScrollElement } from "./chat-scroll";
 
 function useMediaQuery(query: string) {
     return useSyncExternalStore(
@@ -64,11 +65,22 @@ export function AIChatPopup() {
 
     // Auto-scroll to bottom when messages change
     useEffect(() => {
-        const el = mobileScrollRef.current ?? desktopScrollRef.current;
-        if (el) {
+        if (!isOpen) return;
+
+        const el = getActiveChatScrollElement(
+            mobileScrollRef.current,
+            desktopScrollRef.current
+        );
+        if (!el) return;
+
+        const scrollToBottom = () => {
             el.scrollTop = el.scrollHeight;
-        }
-    }, [messages]);
+        };
+        scrollToBottom();
+
+        const frameId = window.requestAnimationFrame(scrollToBottom);
+        return () => window.cancelAnimationFrame(frameId);
+    }, [isOpen, isLoading, messages]);
 
     // Focus input when opened
     useEffect(() => {

@@ -6,6 +6,7 @@ const ts = require("typescript");
 
 const routePath = join(process.cwd(), "src/app/api/chat/route.ts");
 const providerPath = join(process.cwd(), "src/components/ui/ai-chat/ai-chat-provider.tsx");
+const chatScrollPath = join(process.cwd(), "src/components/ui/ai-chat/chat-scroll.ts");
 
 function loadCommonJsModule(filePath, compilerOptions = {}) {
   const { outputText } = ts.transpileModule(readFileSync(filePath, "utf8"), {
@@ -147,6 +148,44 @@ test("chat stream timeout preserves assistant text that already rendered", () =>
       content: "Request timed out. Please check your connection and try again.",
       isError: true,
     }
+  );
+});
+
+test("chat auto-scroll targets the visible desktop viewport instead of hidden mobile pane", () => {
+  const { getActiveChatScrollElement } = loadCommonJsModule(chatScrollPath);
+
+  assert.equal(typeof getActiveChatScrollElement, "function");
+
+  const visibleMobilePane = {
+    getClientRects: () => [{ width: 360, height: 480 }],
+    offsetHeight: 480,
+    offsetWidth: 360,
+  };
+  const hiddenMobilePane = {
+    getClientRects: () => [],
+    offsetHeight: 0,
+    offsetWidth: 0,
+  };
+  const desktopViewport = {
+    getClientRects: () => [{ width: 420, height: 480 }],
+    offsetHeight: 480,
+    offsetWidth: 420,
+  };
+  const desktopRoot = {
+    getClientRects: () => [{ width: 420, height: 480 }],
+    offsetHeight: 480,
+    offsetWidth: 420,
+    querySelector: (selector) =>
+      selector === "[data-radix-scroll-area-viewport]" ? desktopViewport : null,
+  };
+
+  assert.equal(
+    getActiveChatScrollElement(visibleMobilePane, desktopRoot),
+    visibleMobilePane
+  );
+  assert.equal(
+    getActiveChatScrollElement(hiddenMobilePane, desktopRoot),
+    desktopViewport
   );
 });
 
