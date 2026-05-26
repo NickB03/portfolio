@@ -1,0 +1,38 @@
+# Architecture
+
+This document captures the current portfolio runtime and AI chat data flow. The diagrams are generated as SVG for crisp documentation rendering and exported as PNG for surfaces that need raster assets.
+
+## System Overview
+
+![nickb.net system architecture](assets/system-architecture.svg)
+
+The site is a Next.js App Router application deployed to Cloudflare Workers through OpenNext. Visitors reach the portfolio UI through the Worker entrypoint, static assets are served from `.open-next/assets`, and the AI chat UI calls the `/api/chat` route when `NEXT_PUBLIC_ENABLE_AI_CHAT` and `ENABLE_AI_CHAT` are enabled.
+
+The `/api/chat` route owns the RAG runtime boundary: request validation, rate limiting, query rewrite, embedding, Supabase vector search, prompt assembly, Gemini streaming, and error responses. Supabase stores `knowledge_chunks` with content, metadata, and a 768-dimensional vector embedding.
+
+## AI Chat RAG Flow
+
+![AI chat RAG data flow](assets/ai-chat-rag-flow.svg)
+
+The read path starts in `AIChatProvider`, which sends the message and capped history to `/api/chat`. The route validates the request, optionally rewrites follow-up questions, creates a Gemini embedding, searches Supabase through `search_knowledge`, assembles context, and streams the Gemini response back to the popup.
+
+The write path is separate and operator-driven. `scripts/seed-knowledge.ts` builds chunks from public-safe resume/project data by default, optionally includes `nick-info.md` when `INCLUDE_PERSONAL_KNOWLEDGE=true`, generates Gemini embeddings, and writes rows into `knowledge_chunks`.
+
+## Source Map
+
+| Area | Source |
+| --- | --- |
+| App shell and chat provider wiring | `src/app/layout.tsx` |
+| Portfolio page sections | `src/app/page.tsx`, `src/components/section/*` |
+| AI chat client state and streaming UI | `src/components/ui/ai-chat/ai-chat-provider.tsx`, `src/components/ui/ai-chat/ai-chat-popup.tsx` |
+| Chat RAG endpoint | `src/app/api/chat/route.ts` |
+| Supabase vector schema and RPC | `supabase/migrations/002_vector_store.sql` |
+| Knowledge seeding | `scripts/seed-knowledge.ts` |
+| Cloudflare Worker deployment | `wrangler.json`, `open-next.config.ts` |
+
+## Diagram Assets
+
+| Diagram | SVG | PNG |
+| --- | --- | --- |
+| System architecture | `docs/assets/system-architecture.svg` | `docs/assets/system-architecture.png` |
+| AI chat RAG data flow | `docs/assets/ai-chat-rag-flow.svg` | `docs/assets/ai-chat-rag-flow.png` |
