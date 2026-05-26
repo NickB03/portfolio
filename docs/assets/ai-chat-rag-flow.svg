@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" width="1400" height="900" role="img" aria-labelledby="title desc">
+  <title id="title">AI Chat RAG Data Flow</title>
+  <desc id="desc">Runtime read path plus seed-time write path for the portfolio assistant.</desc>
+  <style>
+    text { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; fill: #111827; }
+    .title { font-size: 22px; font-weight: 700; }
+    .subtitle { font-size: 13px; fill: #6b7280; }
+    .label { font-size: 14px; font-weight: 700; }
+    .small { font-size: 12px; fill: #6b7280; }
+    .tiny { font-size: 11px; fill: #6b7280; }
+    .lane-label { font-size: 11px; font-weight: 700; fill: #374151; letter-spacing: 1px; }
+  </style>
+  <defs>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#059669"/>
+    </marker>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrow-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ea580c"/>
+    </marker>
+    <marker id="arrow-gray" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6b7280"/>
+    </marker>
+  </defs>
+  <rect width="1400" height="900" fill="#ffffff"/>
+  <text x="40" y="38" class="title">AI Chat RAG Data Flow</text>
+  <text x="40" y="60" class="subtitle">Runtime read path plus seed-time write path for the portfolio assistant.</text>
+  <rect x="50" y="84" width="1300" height="385" rx="10" fill="#eff6ff" fill-opacity="0.55" stroke="#bfdbfe" stroke-width="1.2" stroke-dasharray="7,5"/>
+  <text x="66" y="106" class="lane-label">RUNTIME READ PATH</text>
+  <rect x="50" y="515" width="1300" height="185" rx="10" fill="#f0fdf4" fill-opacity="0.55" stroke="#bbf7d0" stroke-width="1.2" stroke-dasharray="7,5"/>
+  <text x="66" y="537" class="lane-label">KNOWLEDGE WRITE PATH</text>
+  <rect x="80" y="154" width="160" height="74" rx="10" fill="#ffffff" stroke="#d1d5db" stroke-width="1.6"/>
+  <rect x="90" y="166" width="34" height="34" rx="9" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.2"/>
+  <text x="107" y="188" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">1</text>
+  <text x="134" y="184" text-anchor="start" class="label">User Message</text>
+  <text x="134" y="204" text-anchor="start" class="small">Prompt + history</text>
+  <rect x="300" y="154" width="175" height="74" rx="10" fill="#ffffff" stroke="#d1d5db" stroke-width="1.6"/>
+  <rect x="310" y="166" width="34" height="34" rx="9" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.2"/>
+  <text x="327" y="188" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">2</text>
+  <text x="354" y="184" text-anchor="start" class="label">AIChatProvider</text>
+  <text x="354" y="204" text-anchor="start" class="small">Timeouts + stream UI</text>
+  <polygon points="585,133 635.2,162.0 635.2,220.0 585,249 534.8,220.0 534.8,162.0" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.6"/>
+  <text x="585" y="189" text-anchor="middle" class="label">/api/chat</text>
+  <text x="585" y="207" text-anchor="middle" class="small">POST</text>
+  <rect x="720" y="154" width="180" height="74" rx="10" fill="#ffffff" stroke="#fed7aa" stroke-width="1.6"/>
+  <rect x="730" y="166" width="34" height="34" rx="9" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.2"/>
+  <text x="747" y="188" text-anchor="middle" font-size="11" font-weight="700" fill="#c2410c">3</text>
+  <text x="774" y="184" text-anchor="start" class="label">Request Guards</text>
+  <text x="774" y="204" text-anchor="start" class="small">Flag, JSON, rate limit</text>
+  <rect x="950" y="154" width="180" height="74" rx="10" fill="#ffffff" stroke="#c4b5fd" stroke-width="1.6"/>
+  <rect x="960" y="166" width="34" height="34" rx="9" fill="#faf5ff" stroke="#ddd6fe" stroke-width="1.2"/>
+  <text x="977" y="188" text-anchor="middle" font-size="11" font-weight="700" fill="#6d28d9">4</text>
+  <text x="1004" y="184" text-anchor="start" class="label">Query Rewrite</text>
+  <text x="1004" y="204" text-anchor="start" class="small">Standalone question</text>
+  <rect x="1180" y="154" width="170" height="74" rx="10" fill="#ffffff" stroke="#c4b5fd" stroke-width="1.6"/>
+  <rect x="1190" y="166" width="34" height="34" rx="9" fill="#faf5ff" stroke="#ddd6fe" stroke-width="1.2"/>
+  <text x="1207" y="188" text-anchor="middle" font-size="11" font-weight="700" fill="#6d28d9">5</text>
+  <text x="1234" y="184" text-anchor="start" class="label">Gemini Embed</text>
+  <text x="1234" y="204" text-anchor="start" class="small">embedding-001</text>
+  <ellipse cx="1265" cy="302" rx="85.0" ry="24.285714285714285" fill="#ecfdf5" stroke="#86efac" stroke-width="1.6"/>
+  <rect x="1180.0" y="302" width="170" height="92" fill="#ecfdf5" stroke="none"/>
+  <line x1="1180.0" y1="302" x2="1180.0" y2="394" stroke="#86efac" stroke-width="1.6"/>
+  <line x1="1350.0" y1="302" x2="1350.0" y2="394" stroke="#86efac" stroke-width="1.6"/>
+  <ellipse cx="1265" cy="336.96" rx="85.0" ry="24.285714285714285" fill="none" stroke="#86efac" stroke-width="0.8" opacity="0.55"/>
+  <ellipse cx="1265" cy="368.24" rx="85.0" ry="24.285714285714285" fill="none" stroke="#86efac" stroke-width="0.8" opacity="0.55"/>
+  <ellipse cx="1265" cy="394" rx="85.0" ry="24.285714285714285" fill="#ecfdf5" stroke="#86efac" stroke-width="1.6"/>
+  <text x="1265" y="336" text-anchor="middle" class="label">search_knowledge</text>
+  <text x="1265" y="356" text-anchor="middle" class="small">pgvector RPC</text>
+  <rect x="950" y="328" width="180" height="74" rx="10" fill="#ffffff" stroke="#86efac" stroke-width="1.6"/>
+  <rect x="960" y="340" width="34" height="34" rx="9" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.2"/>
+  <text x="977" y="362" text-anchor="middle" font-size="11" font-weight="700" fill="#047857">6</text>
+  <text x="1004" y="358" text-anchor="start" class="label">Context Assembly</text>
+  <text x="1004" y="378" text-anchor="start" class="small">Matches + prompt</text>
+  <rect x="720" y="328" width="180" height="74" rx="10" fill="#ffffff" stroke="#c4b5fd" stroke-width="1.6"/>
+  <rect x="730" y="340" width="34" height="34" rx="9" fill="#faf5ff" stroke="#ddd6fe" stroke-width="1.2"/>
+  <text x="747" y="362" text-anchor="middle" font-size="11" font-weight="700" fill="#6d28d9">7</text>
+  <text x="774" y="358" text-anchor="start" class="label">Gemini Stream</text>
+  <text x="774" y="378" text-anchor="start" class="small">Primary + fallback</text>
+  <rect x="445" y="328" width="200" height="74" rx="10" fill="#ffffff" stroke="#bfdbfe" stroke-width="1.6"/>
+  <rect x="455" y="340" width="34" height="34" rx="9" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.2"/>
+  <text x="472" y="362" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">8</text>
+  <text x="499" y="358" text-anchor="start" class="label">SSE Transform</text>
+  <text x="499" y="378" text-anchor="start" class="small">Text chunks only</text>
+  <rect x="170" y="328" width="170" height="74" rx="10" fill="#ffffff" stroke="#d1d5db" stroke-width="1.6"/>
+  <rect x="180" y="340" width="34" height="34" rx="9" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.2"/>
+  <text x="197" y="362" text-anchor="middle" font-size="11" font-weight="700" fill="#1d4ed8">9</text>
+  <text x="224" y="358" text-anchor="start" class="label">Chat Bubble</text>
+  <text x="224" y="378" text-anchor="start" class="small">Markdown render</text>
+  <path d="M 240,191 L 300,191" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+  <rect x="240.0" y="164" width="60" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="270" y="178" text-anchor="middle" class="tiny">send</text>
+  <path d="M 475,191 L 527,191" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+  <rect x="471.0" y="164" width="60" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="501" y="178" text-anchor="middle" class="tiny">POST</text>
+  <path d="M 643,191 L 720,191" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-orange)"/>
+  <rect x="646.0" y="164" width="70" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="681" y="178" text-anchor="middle" class="tiny">validate</text>
+  <path d="M 900,191 L 950,191" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-orange)"/>
+  <rect x="893.5" y="164" width="63" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="925" y="178" text-anchor="middle" class="tiny">allowed</text>
+  <path d="M 1130,191 L 1180,191" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-purple)"/>
+  <rect x="1123.5" y="164" width="63" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="1155" y="178" text-anchor="middle" class="tiny">rewrite</text>
+  <path d="M 1265,228 L 1265,302" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-purple)"/>
+  <rect x="1260.0" y="253" width="60" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="1290" y="267" text-anchor="middle" class="tiny">embed</text>
+  <path d="M 1180,348 L 1130,348" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-green)"/>
+  <rect x="1123.5" y="321" width="63" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="1155" y="335" text-anchor="middle" class="tiny">matches</text>
+  <path d="M 950,365 L 900,365" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-green)"/>
+  <rect x="893.5" y="338" width="63" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="925" y="352" text-anchor="middle" class="tiny">context</text>
+  <path d="M 720,365 L 645,365" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-purple)"/>
+  <rect x="652.0" y="338" width="60" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="682" y="352" text-anchor="middle" class="tiny">SSE</text>
+  <path d="M 445,365 L 340,365" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-blue)"/>
+  <rect x="362.0" y="338" width="60" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="392" y="352" text-anchor="middle" class="tiny">chunks</text>
+  <rect x="90" y="570" width="210" height="76" rx="10" fill="#ffffff" stroke="#d1d5db" stroke-width="1.6"/>
+  <rect x="100" y="582" width="34" height="34" rx="9" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.2"/>
+  <text x="117" y="604" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">SRC</text>
+  <text x="144" y="600" text-anchor="start" class="label">Seed Facts</text>
+  <text x="144" y="620" text-anchor="start" class="small">public facts + optional notes</text>
+  <rect x="390" y="570" width="200" height="76" rx="10" fill="#ffffff" stroke="#86efac" stroke-width="1.6"/>
+  <rect x="400" y="582" width="34" height="34" rx="9" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.2"/>
+  <text x="417" y="604" text-anchor="middle" font-size="11" font-weight="700" fill="#047857">JOB</text>
+  <text x="444" y="600" text-anchor="start" class="label">seed-knowledge.ts</text>
+  <text x="444" y="620" text-anchor="start" class="small">Chunk + metadata</text>
+  <rect x="680" y="570" width="190" height="76" rx="10" fill="#ffffff" stroke="#c4b5fd" stroke-width="1.6"/>
+  <rect x="690" y="582" width="34" height="34" rx="9" fill="#faf5ff" stroke="#ddd6fe" stroke-width="1.2"/>
+  <text x="707" y="604" text-anchor="middle" font-size="11" font-weight="700" fill="#6d28d9">AI</text>
+  <text x="734" y="600" text-anchor="start" class="label">Gemini Embeds</text>
+  <text x="734" y="620" text-anchor="start" class="small">3072-d vectors</text>
+  <ellipse cx="1265" cy="560" rx="110.0" ry="31.428571428571427" fill="#ecfdf5" stroke="#86efac" stroke-width="1.6"/>
+  <rect x="1155.0" y="560" width="220" height="100" fill="#ecfdf5" stroke="none"/>
+  <line x1="1155.0" y1="560" x2="1155.0" y2="660" stroke="#86efac" stroke-width="1.6"/>
+  <line x1="1375.0" y1="560" x2="1375.0" y2="660" stroke="#86efac" stroke-width="1.6"/>
+  <ellipse cx="1265" cy="598.0" rx="110.0" ry="31.428571428571427" fill="none" stroke="#86efac" stroke-width="0.8" opacity="0.55"/>
+  <ellipse cx="1265" cy="632.0" rx="110.0" ry="31.428571428571427" fill="none" stroke="#86efac" stroke-width="0.8" opacity="0.55"/>
+  <ellipse cx="1265" cy="660" rx="110.0" ry="31.428571428571427" fill="#ecfdf5" stroke="#86efac" stroke-width="1.6"/>
+  <text x="1265" y="594" text-anchor="middle" class="label">knowledge_chunks</text>
+  <text x="1265" y="614" text-anchor="middle" class="small">content + metadata</text>
+  <text x="1265" y="630" text-anchor="middle" class="small">embedding vector</text>
+  <path d="M 300,608 L 390,608" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-green)" stroke-dasharray="6,4"/>
+  <rect x="303.0" y="581" width="84" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="345" y="595" text-anchor="middle" class="tiny">read facts</text>
+  <path d="M 590,608 L 680,608" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-purple)"/>
+  <rect x="605.0" y="581" width="60" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="635" y="595" text-anchor="middle" class="tiny">embed</text>
+  <path d="M 870,608 L 1155,608" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-green)" stroke-dasharray="6,4"/>
+  <rect x="966.5" y="581" width="91" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="1012" y="595" text-anchor="middle" class="tiny">insert rows</text>
+  <path d="M 1265,560 L 1265,394" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow-green)" stroke-dasharray="6,4"/>
+  <rect x="1256.5" y="467" width="105" height="20" rx="4" fill="#ffffff" opacity="0.96"/>
+  <text x="1309" y="481" text-anchor="middle" class="tiny">queried later</text>
+  <rect x="84" y="735" width="340" height="114" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+  <line x1="100" y1="755" x2="134" y2="755" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <text x="144" y="759" class="small">Client request and streamed text</text>
+  <line x1="100" y1="779" x2="134" y2="779" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-orange)"/>
+  <text x="144" y="783" class="small">Control and guard flow</text>
+  <line x1="100" y1="803" x2="134" y2="803" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrow-purple)"/>
+  <text x="144" y="807" class="small">Gemini rewrite, embedding, generation</text>
+  <line x1="100" y1="827" x2="134" y2="827" stroke="#059669" stroke-width="2" marker-end="url(#arrow-green)" stroke-dasharray="6,4"/>
+  <text x="144" y="831" class="small">Knowledge read/write operations</text>
+</svg>

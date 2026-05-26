@@ -9,7 +9,7 @@ Built with Next.js 16, React 19, and TypeScript. Features an AI chat assistant p
 - **AI Chat Assistant** — Interactive chatbot with streaming responses, powered by Gemini embeddings and semantic search over a curated knowledge base (Supabase + pgvector)
 - **Project Showcase** — Highlighted builds including [vana.bot](https://vana.bot) and enterprise case studies
 - **Work Experience Timeline** — Career progression with role details and accomplishments
-- **Blog System** — MDX-powered blog with syntax highlighting, GitHub Flavored Markdown, and content collections
+- **Blog System** — MDX-ready blog pipeline with syntax highlighting, GitHub Flavored Markdown, and content collections
 - **Use Cases** — In-depth case studies with dedicated pages (e.g., BreeziNet)
 - **Dark/Light Theme** — System-aware theme switching with smooth transitions
 - **Animations** — Blur fade effects, flickering grid backgrounds, and animated UI elements via Framer Motion
@@ -44,10 +44,18 @@ src/
 │   └── resume.tsx          # Centralized portfolio data (work, projects, contact)
 ├── hooks/                  # Custom React hooks
 └── lib/                    # Utilities, Supabase client, pagination
-content/                    # MDX blog posts
+content/                    # Optional MDX blog posts when present
 scripts/                    # Knowledge base seeding & verification
 supabase/                   # Database migrations
 ```
+
+## Architecture
+
+The main runtime runs as a Next.js App Router application deployed to Cloudflare Workers through OpenNext. The portfolio UI, content routes, static assets, AI chat UI, `/api/chat` endpoint, Gemini APIs, and Supabase vector store are split across the boundaries shown below.
+
+![nickb.net system architecture](docs/assets/system-architecture.svg)
+
+For more detail, see [docs/architecture.md](docs/architecture.md).
 
 ## Getting Started
 
@@ -128,12 +136,16 @@ The non-secret Worker flags live in `wrangler.json`. Keep `SUPABASE_SERVICE_ROLE
 
 The AI chat assistant uses a RAG pipeline:
 
-1. **User query** is converted to an embedding via Google Gemini's embedding API
-2. **Semantic search** finds the most relevant knowledge base entries using pgvector cosine similarity in Supabase
-3. **Context assembly** combines retrieved passages with a system prompt
-4. **Response generation** streams a grounded answer back to the client via Server-Sent Events (SSE)
+![AI chat RAG data flow](docs/assets/ai-chat-rag-flow.svg)
 
-The knowledge base is seeded from `nick-info.md` and stored as vector embeddings in Supabase for fast retrieval.
+1. **Client request** sends the latest message plus capped chat history from the AI chat provider to `/api/chat`
+2. **Request guards** enforce the feature flag, JSON validation, message validation, and in-memory IP rate limiting
+3. **Query rewrite and embedding** use Gemini to turn follow-up messages into standalone questions and embed the search query
+4. **Semantic search** calls the Supabase `search_knowledge` RPC over `knowledge_chunks.embedding`
+5. **Context assembly** combines the top matches with the system prompt and current conversation
+6. **Response generation** streams Gemini output back to the client as plain text chunks
+
+The knowledge base is seeded from public-safe resume/project data by default, with optional `nick-info.md` chunks when `INCLUDE_PERSONAL_KNOWLEDGE=true`, and stored as vector embeddings in Supabase for fast retrieval.
 
 ## License
 
