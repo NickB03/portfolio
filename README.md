@@ -7,12 +7,12 @@ Built with Next.js 16, React 19, and TypeScript. Features an AI chat assistant p
 ## Features
 
 - **AI Chat Assistant** — Interactive chatbot with streaming responses, powered by Gemini embeddings and semantic search over a curated knowledge base (Supabase + pgvector)
-- **Project Showcase** — Highlighted builds including [vana.bot](https://vana.bot) and enterprise case studies
+- **Project Showcase** — Highlighted builds including [polymorph](https://polymorph.fyi), [vana.bot](https://vana.bot), and AnalystAI
 - **Work Experience Timeline** — Career progression with role details and accomplishments
 - **Blog System** — MDX-ready blog pipeline with syntax highlighting, GitHub Flavored Markdown, and content collections
-- **Use Cases** — In-depth case studies with dedicated pages (e.g., BreeziNet)
+- **Use Cases** — BreeziNet case study content plus use-case card metadata
 - **Dark/Light Theme** — System-aware theme switching with smooth transitions
-- **Animations** — Blur fade effects, flickering grid backgrounds, and animated UI elements via Framer Motion
+- **Animations** — Blur fade effects, flickering grid backgrounds, and animated UI elements via `motion`
 
 ## Tech Stack
 
@@ -21,7 +21,7 @@ Built with Next.js 16, React 19, and TypeScript. Features an AI chat assistant p
 | Framework | [Next.js 16](https://nextjs.org) (App Router) |
 | UI | [React 19](https://react.dev), [TypeScript](https://typescriptlang.org) |
 | Styling | [Tailwind CSS 4](https://tailwindcss.com), [shadcn/ui](https://ui.shadcn.com), [Radix UI](https://radix-ui.com) |
-| Animation | [Framer Motion](https://motion.dev), custom Magic UI components |
+| Animation | [`motion`](https://motion.dev), custom Magic UI components |
 | Content | [MDX](https://mdxjs.com) via [content-collections](https://content-collections.dev) |
 | Database | [Supabase](https://supabase.com) (PostgreSQL + pgvector) |
 | AI/Embeddings | Google Gemini API (embeddings + generation) |
@@ -32,7 +32,7 @@ Built with Next.js 16, React 19, and TypeScript. Features an AI chat assistant p
 ```
 src/
 ├── app/                    # Next.js App Router pages & API routes
-│   ├── api/chat/           # AI chat SSE endpoint
+│   ├── api/chat/           # AI chat streaming text endpoint
 │   ├── blog/               # Blog listing & individual post pages
 │   └── use-cases/          # Case study pages
 ├── components/
@@ -41,7 +41,7 @@ src/
 │   ├── ui/                 # shadcn/ui components + AI chat + SVG icons
 │   └── mdx/                # MDX rendering components
 ├── data/
-│   └── resume.tsx          # Centralized portfolio data (work, projects, contact)
+│   └── resume.tsx          # Centralized portfolio list data (work, projects, contact, use-case cards)
 ├── hooks/                  # Custom React hooks
 └── lib/                    # Utilities, Supabase client, pagination
 content/                    # Optional MDX blog posts when present

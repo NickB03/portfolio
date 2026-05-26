@@ -16,7 +16,7 @@ npm run lint:fix     # Auto-fix lint issues
 npm run test:chat-flags  # Verify the chat API uses the server-only feature flag
 npm run preview      # Build and preview Cloudflare deployment locally
 npm run deploy       # Build and deploy to Cloudflare Workers
-npx tsx scripts/seed-knowledge.ts    # Seed AI knowledge base from nick-info.md
+npx tsx scripts/seed-knowledge.ts    # Seed AI knowledge base from public-safe facts; optionally include nick-info.md
 npx tsx scripts/verify-knowledge.ts  # Verify knowledge base entries
 ```
 
@@ -27,17 +27,17 @@ Focused tests use Node's built-in test runner.
 ### Rendering & Routing
 - **App Router** (`src/app/`): File-based routing with layouts
 - **Server Components** by default; `"use client"` directive for interactive components (chat, navbar, animations)
-- **Blog**: MDX files in `/content/` compiled via content-collections; schema defined in `content-collections.ts`. Uses `remarkGfm` and a custom `remarkCodeMeta` plugin.
-- **Static data**: All portfolio content (work, projects, contact) centralized in `src/data/resume.tsx`
+- **Blog**: MDX files in `/content/` when present, compiled via content-collections; schema defined in `content-collections.ts`. Uses `remarkGfm` and a custom `remarkCodeMeta` plugin.
+- **Static data**: Portfolio list data (summary, work, projects, contact, use-case cards) is centralized in `src/data/resume.tsx`; route-specific long-form content such as BreeziNet lives in its page component.
 
 ### AI Chat System (RAG)
-- **API endpoint**: `src/app/api/chat/route.ts` — POST, returns streaming SSE
-- **Flow**: User message → Gemini embedding → Supabase pgvector cosine similarity search (threshold 0.5, top 5) → context assembly → Gemini streaming response
+- **API endpoint**: `src/app/api/chat/route.ts` — POST, returns streamed `text/plain` chunks. The route consumes Gemini's upstream SSE stream and transforms it before sending text to the client.
+- **Flow**: User message → Gemini embedding → Supabase pgvector cosine similarity search (threshold 0.5, top 5) → context assembly → Gemini generation → streamed text response
 - **Models**: Primary `gemini-flash-lite-latest`, fallback `gemini-flash-latest` on quota errors
 - **Timeouts**: 60s connection timeout, 15s per-chunk stream timeout
 - **History**: Capped at 10 messages; follow-up queries are rewritten for context
 - **Client state**: React Context via `AIChatProvider` (`src/components/ui/ai-chat/ai-chat-provider.tsx`)
-- **Knowledge base**: Seeded from `nick-info.md` via `scripts/seed-knowledge.ts` — chunks text with metadata (source, type, topics), embeds via Gemini, stores in Supabase
+- **Knowledge base**: Seeded from public-safe resume/project facts by default via `scripts/seed-knowledge.ts`; `nick-info.md` chunks are included only when `INCLUDE_PERSONAL_KNOWLEDGE=true`. Chunks include metadata (source, type, topics), embed via Gemini, and store in Supabase.
 - **Feature flags**: `ENABLE_AI_CHAT=true` enables the server endpoint; `NEXT_PUBLIC_ENABLE_AI_CHAT=true` shows the chat UI
 
 ### Component Organization
@@ -85,8 +85,8 @@ Required in `.env.local` (see `.env.example`):
 
 - shadcn/ui components are added/modified in `src/components/ui/` — do not create parallel component systems
 - Animation components live in `src/components/magicui/` using the `motion` library (not framer-motion)
-- Portfolio data changes go in `src/data/resume.tsx`, not in individual page files
-- Blog posts are `.mdx` files in `/content/` with frontmatter: `title`, `publishedAt`, `summary`, `image` (optional), `author` (optional)
+- Portfolio list data changes go in `src/data/resume.tsx`; route-specific long-form page copy can live with the route component when that is the existing source of truth.
+- Blog posts are `.mdx` files in `/content/` with frontmatter: `title`, `publishedAt`, `summary`, `updatedAt` (optional), `image` (optional), `author` (optional)
 - Supabase client is initialized in `src/lib/supabase.ts`
 - ESLint uses flat config format (`eslint.config.mjs`) with `@next/core-web-vitals`
 - TypeScript strict mode is enabled; target ES2017, module resolution `bundler`
