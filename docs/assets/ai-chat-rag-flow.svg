@@ -124,8 +124,8 @@
   <rect x="90" y="570" width="210" height="76" rx="10" fill="#ffffff" stroke="#d1d5db" stroke-width="1.6"/>
   <rect x="100" y="582" width="34" height="34" rx="9" fill="#f9fafb" stroke="#d1d5db" stroke-width="1.2"/>
   <text x="117" y="604" text-anchor="middle" font-size="11" font-weight="700" fill="#374151">SRC</text>
-  <text x="144" y="600" text-anchor="start" class="label">Portfolio Facts</text>
-  <text x="144" y="620" text-anchor="start" class="small">resume.tsx + optional notes</text>
+  <text x="144" y="600" text-anchor="start" class="label">Seed Facts</text>
+  <text x="144" y="620" text-anchor="start" class="small">public facts + optional notes</text>
   <rect x="390" y="570" width="200" height="76" rx="10" fill="#ffffff" stroke="#86efac" stroke-width="1.6"/>
   <rect x="400" y="582" width="34" height="34" rx="9" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.2"/>
   <text x="417" y="604" text-anchor="middle" font-size="11" font-weight="700" fill="#047857">JOB</text>

@@ -49,3 +49,30 @@ test("architecture docs describe the current Gemini embedding dimension and sche
     "AI chat RAG diagram should not render the obsolete vector size"
   );
 });
+
+test("architecture diagrams describe seed source facts without resume.tsx drift", () => {
+  const systemArchitectureSvg = readRepoFile("docs/assets/system-architecture.svg");
+  const ragFlowSvg = readRepoFile("docs/assets/ai-chat-rag-flow.svg");
+
+  for (const [diagramName, svg] of [
+    ["system architecture", systemArchitectureSvg],
+    ["AI chat RAG flow", ragFlowSvg],
+  ]) {
+    assert.doesNotMatch(
+      svg,
+      /resume\.tsx/,
+      `${diagramName} diagram should not imply the seed job reads resume.tsx`
+    );
+  }
+
+  assert.match(
+    systemArchitectureSvg,
+    />Seed Facts<\/text>\s*<text[^>]*>public facts<\/text>\s*<text[^>]*>nick-info\.md optional<\/text>/,
+    "system architecture diagram should label seed inputs as public facts plus optional notes"
+  );
+  assert.match(
+    ragFlowSvg,
+    />Seed Facts<\/text>\s*<text[^>]*>public facts \+ optional notes<\/text>/,
+    "AI chat RAG diagram should label seed inputs as public facts plus optional notes"
+  );
+});
