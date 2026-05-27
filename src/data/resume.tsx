@@ -130,8 +130,8 @@ export const DATA = {
           icon: <Icons.github className="size-3" />,
         },
       ],
-      image: "/polymorph.png",
-      video: "",
+      image: "/polymorph-demo-poster.png",
+      video: "/polymorph-demo.mp4",
       imageClassName: "aspect-video w-full object-cover",
     },
     {

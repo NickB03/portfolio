@@ -70,6 +70,7 @@ export function ProjectCard({
         {video ? (
           <video
             src={video}
+            poster={image}
             autoPlay
             loop
             muted
