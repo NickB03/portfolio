@@ -44,6 +44,9 @@ export function Markdown({ children, className }: MarkdownProps) {
         className: string;
       }) {
         return (
+          // Renders arbitrary markdown image URLs; next/image would require
+          // pre-configuring every possible remote host, so a raw <img> is used.
+          // eslint-disable-next-line @next/next/no-img-element
           <img src={src} alt={alt} className={cn(className, "w-full h-auto")} />
         );
       },
