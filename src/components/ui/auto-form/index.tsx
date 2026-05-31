@@ -85,6 +85,10 @@ function AutoForm<SchemaType extends ZodObjectOrWrapped>({
   }
 
   React.useEffect(() => {
+    // form.watch() returns a subscription whose callback React Compiler cannot
+    // memoize. The subscribe/unsubscribe pattern is the supported react-hook-form
+    // API, so we opt just this line out of the compiler-compatibility check.
+    // eslint-disable-next-line react-hooks/incompatible-library
     const subscription = form.watch((values) => {
       onValuesChangeProp?.(values as any, form as any);
       const parsedValues = formSchema.safeParse(values);

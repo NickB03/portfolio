@@ -263,6 +263,10 @@ export const ImageViewBlock: React.FC<NodeViewProps> = ({
                   setImageState((prev) => ({ ...prev, isZoomed: false }))
                 }
               >
+                {/* Editor image node: needs a raw <img> for live resize/zoom
+                    over arbitrary blob/data/remote URLs that next/image can't
+                    serve. */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   className={cn(
                     "h-auto rounded object-contain transition-shadow",
