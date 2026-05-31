@@ -13,6 +13,7 @@ npm run dev          # Start dev server (localhost:3000)
 npm run build        # Production build
 npm run lint         # ESLint check
 npm run lint:fix     # Auto-fix lint issues
+npm test             # Run the full Node test suite (tests/*.test.js)
 npm run test:chat-flags  # Verify the chat API uses the server-only feature flag
 npm run preview      # Build and preview Cloudflare deployment locally
 npm run deploy       # Build and deploy to Cloudflare Workers
@@ -20,7 +21,7 @@ npx tsx scripts/seed-knowledge.ts    # Seed AI knowledge base from public-safe f
 npx tsx scripts/verify-knowledge.ts  # Verify knowledge base entries
 ```
 
-Focused tests use Node's built-in test runner.
+Tests use Node's built-in test runner (`node --test`); `npm test` runs every `tests/*.test.js` file, while `npm run test:chat-flags` runs only the feature-flag check.
 
 ## Architecture
 
@@ -34,7 +35,7 @@ Focused tests use Node's built-in test runner.
 - **API endpoint**: `src/app/api/chat/route.ts` — POST, returns streamed `text/plain` chunks. The route consumes Gemini's upstream SSE stream and transforms it before sending text to the client.
 - **Flow**: User message → Gemini embedding → Supabase pgvector cosine similarity search (threshold 0.5, top 5) → context assembly → Gemini generation → streamed text response
 - **Models**: Primary `gemini-flash-lite-latest`, fallback `gemini-flash-latest` on quota errors
-- **Timeouts**: 60s connection timeout, 15s per-chunk stream timeout
+- **Timeouts**: 60s connection timeout, 15s per-chunk stream timeout (enforced client-side in `AIChatProvider`)
 - **History**: Capped at 10 messages; follow-up queries are rewritten for context
 - **Client state**: React Context via `AIChatProvider` (`src/components/ui/ai-chat/ai-chat-provider.tsx`)
 - **Knowledge base**: Seeded from public-safe resume/project facts by default via `scripts/seed-knowledge.ts`; `nick-info.md` chunks are included only when `INCLUDE_PERSONAL_KNOWLEDGE=true`. Chunks include metadata (source, type, topics), embed via Gemini, and store in Supabase.
