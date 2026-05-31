@@ -1,5 +1,5 @@
 const assert = require("node:assert/strict");
-const { readFileSync } = require("node:fs");
+const { readFileSync, existsSync } = require("node:fs");
 const { join } = require("node:path");
 const test = require("node:test");
 const ts = require("typescript");
@@ -7,6 +7,43 @@ const ts = require("typescript");
 const routePath = join(process.cwd(), "src/app/api/chat/route.ts");
 const providerPath = join(process.cwd(), "src/components/ui/ai-chat/ai-chat-provider.tsx");
 const chatScrollPath = join(process.cwd(), "src/components/ui/ai-chat/chat-scroll.ts");
+
+function resolveAliasPath(id) {
+  const base = join(process.cwd(), "src", id.slice(2));
+  const candidates = [
+    base,
+    `${base}.ts`,
+    `${base}.tsx`,
+    `${base}.js`,
+    join(base, "index.ts"),
+    join(base, "index.tsx"),
+    join(base, "index.js"),
+  ];
+  return candidates.find((candidate) => existsSync(candidate)) || base;
+}
+
+// Mirrors the `@/*` -> `./src/*` path alias so transpiled modules can require
+// sibling source files instead of only node_modules packages.
+function createAliasRequire(baseRequire, compilerOptions, cache) {
+  return function aliasRequire(id) {
+    if (!id.startsWith("@/")) return baseRequire(id);
+
+    const filePath = resolveAliasPath(id);
+    if (cache.has(filePath)) return cache.get(filePath).exports;
+
+    const { outputText } = ts.transpileModule(readFileSync(filePath, "utf8"), {
+      compilerOptions: {
+        module: ts.ModuleKind.CommonJS,
+        target: ts.ScriptTarget.ES2022,
+        ...compilerOptions,
+      },
+    });
+    const mod = { exports: {} };
+    cache.set(filePath, mod);
+    new Function("require", "module", "exports", outputText)(aliasRequire, mod, mod.exports);
+    return mod.exports;
+  };
+}
 
 function loadCommonJsModule(filePath, compilerOptions = {}) {
   const { outputText } = ts.transpileModule(readFileSync(filePath, "utf8"), {
@@ -18,8 +55,9 @@ function loadCommonJsModule(filePath, compilerOptions = {}) {
   });
 
   const routeModule = { exports: {} };
+  const aliasRequire = createAliasRequire(require, compilerOptions, new Map());
   const compile = new Function("require", "module", "exports", outputText);
-  compile(require, routeModule, routeModule.exports);
+  compile(aliasRequire, routeModule, routeModule.exports);
 
   return routeModule.exports;
 }

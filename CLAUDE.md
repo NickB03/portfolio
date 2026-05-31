@@ -32,12 +32,12 @@ Focused tests use Node's built-in test runner.
 
 ### AI Chat System (RAG)
 - **API endpoint**: `src/app/api/chat/route.ts` — POST, returns streamed `text/plain` chunks. The route consumes Gemini's upstream SSE stream and transforms it before sending text to the client.
-- **Flow**: User message → Gemini embedding → Supabase pgvector cosine similarity search (threshold 0.5, top 5) → context assembly → Gemini generation → streamed text response
+- **Flow**: User message → query rewrite → Gemini embedding → hybrid retrieval (pgvector cosine + Postgres full-text, fused via Reciprocal Rank Fusion) + 1-hop knowledge-graph expansion → context assembly → Gemini generation → streamed text response. Retrieval lives in `src/lib/knowledge/hybrid-search.ts`; SQL RPCs (`search_knowledge`, `keyword_search_knowledge`, `traverse_graph`) gate private content via an `include_private` param.
 - **Models**: Primary `gemini-flash-lite-latest`, fallback `gemini-flash-latest` on quota errors
 - **Timeouts**: 60s connection timeout, 15s per-chunk stream timeout
 - **History**: Capped at 10 messages; follow-up queries are rewritten for context
 - **Client state**: React Context via `AIChatProvider` (`src/components/ui/ai-chat/ai-chat-provider.tsx`)
-- **Knowledge base**: Seeded from public-safe resume/project facts by default via `scripts/seed-knowledge.ts`; `nick-info.md` chunks are included only when `INCLUDE_PERSONAL_KNOWLEDGE=true`. Chunks include metadata (source, type, topics), embed via Gemini, and store in Supabase.
+- **Knowledge base**: Compiled from the in-repo knowledge graph in `content/knowledge/**/*.md` (frontmatter + `[[wikilinks]]`) via `scripts/seed-knowledge.ts` (parser: `scripts/lib/knowledge-parser.ts`). Seeding builds `knowledge_chunks` (with `entity_id`/`visibility`), `kg_entities`, and `kg_edges`. `visibility: private` files and optional `nick-info.md` notes are seeded only when `INCLUDE_PERSONAL_KNOWLEDGE=true`. Embeddings are gemini-embedding-001 at 3072 dims (sequential scan); a 1536-dim + HNSW index is a documented future optimization. Run `npm test` then apply `supabase/migrations/005_knowledge_graph_and_hybrid.sql` and re-seed when changing knowledge content.
 - **Feature flags**: `ENABLE_AI_CHAT=true` enables the server endpoint; `NEXT_PUBLIC_ENABLE_AI_CHAT=true` shows the chat UI
 
 ### Component Organization

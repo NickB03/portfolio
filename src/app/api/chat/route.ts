@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { hybridSearch } from "@/lib/knowledge/hybrid-search";
 
 const SYSTEM_PROMPT = `You are Nick's AI assistant on Nick Bohmer's portfolio site. You know Nick well and can speak about him with confidence and warmth.
 
@@ -118,28 +118,6 @@ async function generateEmbedding(text: string): Promise<number[]> {
 
     const data = await response.json();
     return data.embedding.values;
-}
-
-async function searchKnowledge(
-    supabaseUrl: string,
-    supabaseKey: string,
-    queryEmbedding: number[],
-    matchCount = 5
-): Promise<{ content: string; metadata: Record<string, unknown>; similarity: number }[]> {
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    const { data, error } = await (supabase.rpc as any)("search_knowledge", {
-        query_embedding: queryEmbedding,
-        match_threshold: 0.5,
-        match_count: matchCount,
-    });
-
-    if (error) {
-        console.error("Search error:", error);
-        return [];
-    }
-
-    return data || [];
 }
 
 interface HistoryMessage {
@@ -407,8 +385,16 @@ export async function POST(request: Request) {
         // Generate embedding for the (potentially rewritten) question
         const queryEmbedding = await generateEmbedding(searchQuery);
 
-        // Search for relevant context
-        const results = await searchKnowledge(supabaseUrl, supabaseKey, queryEmbedding);
+        // Hybrid retrieval: vector + keyword + 1-hop graph expansion.
+        // Public-only for now; `includePrivate` is the future owner-auth hook.
+        const results = await hybridSearch({
+            supabaseUrl,
+            supabaseKey,
+            queryText: searchQuery,
+            queryEmbedding,
+            includePrivate: false,
+            limit: 6,
+        });
 
         // Build context from search results
         let context = "";

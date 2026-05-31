@@ -50,6 +50,41 @@ async function main() {
         console.log(`   Content preview: ${chunk.content.substring(0, 100)}...`);
         console.log();
     });
+
+    // Knowledge graph stats
+    const { count: entityCount } = await supabase
+        .from("kg_entities")
+        .select("*", { count: "exact", head: true });
+    const { count: edgeCount } = await supabase
+        .from("kg_edges")
+        .select("*", { count: "exact", head: true });
+    console.log(`🕸️  Graph: ${entityCount ?? "?"} entities, ${edgeCount ?? "?"} edges\n`);
+
+    // Sample 1-hop traversal from a known entity
+    const { data: sampleEntity } = await supabase
+        .from("kg_entities")
+        .select("id, title")
+        .limit(1)
+        .maybeSingle();
+
+    if (sampleEntity) {
+        const traverse = supabase.rpc.bind(supabase) as unknown as (
+            fn: string,
+            params: Record<string, unknown>
+        ) => Promise<{ data: { title: string }[] | null; error: { message: string } | null }>;
+        const { data: neighbors, error: traverseError } = await traverse("traverse_graph", {
+            entity_ids: [sampleEntity.id],
+            max_neighbors: 5,
+            include_private: false,
+        });
+
+        if (traverseError) {
+            console.error("⚠️  traverse_graph error:", traverseError.message);
+        } else {
+            const titles = (neighbors ?? []).map((n) => n.title).join(", ") || "(none)";
+            console.log(`🔗 Neighbors of "${sampleEntity.title}": ${titles}\n`);
+        }
+    }
 }
 
 main().catch(console.error);

@@ -14,9 +14,9 @@ The `/api/chat` route owns the RAG runtime boundary: request validation, rate li
 
 ![AI chat RAG data flow](assets/ai-chat-rag-flow.svg)
 
-The read path starts in `AIChatProvider`, which sends the message and capped history to `/api/chat`. The route validates the request, optionally rewrites follow-up questions, creates a Gemini embedding, searches Supabase through `search_knowledge`, assembles context, consumes Gemini's upstream SSE stream, and sends `text/plain` chunks back to the popup.
+The read path starts in `AIChatProvider`, which sends the message and capped history to `/api/chat`. The route validates the request, optionally rewrites follow-up questions, creates a Gemini embedding, and runs hybrid retrieval through `src/lib/knowledge/hybrid-search.ts` — fusing `search_knowledge` (vector cosine) and `keyword_search_knowledge` (Postgres full-text) via Reciprocal Rank Fusion, then expanding with 1-hop `traverse_graph` neighbors. It assembles context, consumes Gemini's upstream SSE stream, and sends `text/plain` chunks back to the popup.
 
-The write path is separate and operator-driven. `scripts/seed-knowledge.ts` builds chunks from public-safe resume/project data by default, optionally includes `nick-info.md` when `INCLUDE_PERSONAL_KNOWLEDGE=true`, generates Gemini embeddings, and writes rows into `knowledge_chunks`.
+The write path is separate and operator-driven. `scripts/seed-knowledge.ts` compiles the in-repo knowledge graph in `content/knowledge/**/*.md` (frontmatter + `[[wikilinks]]`) into `knowledge_chunks`, `kg_entities`, and `kg_edges`, gating `visibility: private` files (and optional `nick-info.md` notes) behind `INCLUDE_PERSONAL_KNOWLEDGE=true`, and generates Gemini embeddings. Embeddings remain 3072-dimensional (sequential scan); a 1536-dim + HNSW index is documented as a future optimization in `005_knowledge_graph_and_hybrid.sql`.
 
 ## Source Map
 
@@ -26,7 +26,10 @@ The write path is separate and operator-driven. `scripts/seed-knowledge.ts` buil
 | Portfolio page sections | `src/app/page.tsx`, `src/components/section/*` |
 | AI chat client state and streaming UI | `src/components/ui/ai-chat/ai-chat-provider.tsx`, `src/components/ui/ai-chat/ai-chat-popup.tsx` |
 | Chat RAG endpoint | `src/app/api/chat/route.ts` |
-| Supabase vector schema and RPC | `supabase/migrations/002_vector_store.sql`, `supabase/migrations/003_update_vector_dimension.sql`, `supabase/migrations/004_fix_security_warnings.sql` |
+| Hybrid retrieval (vector + keyword + graph) | `src/lib/knowledge/hybrid-search.ts` |
+| Supabase vector schema and RPC | `supabase/migrations/002_vector_store.sql`, `supabase/migrations/003_update_vector_dimension.sql`, `supabase/migrations/004_fix_security_warnings.sql`, `supabase/migrations/005_knowledge_graph_and_hybrid.sql` |
+| In-repo knowledge graph source | `content/knowledge/**/*.md` |
+| Knowledge parsing | `scripts/lib/knowledge-parser.ts` |
 | Knowledge seeding | `scripts/seed-knowledge.ts` |
 | Cloudflare Worker deployment | `wrangler.json`, `open-next.config.ts` |
 

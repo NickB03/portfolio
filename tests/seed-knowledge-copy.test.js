@@ -3,11 +3,11 @@ const { readFileSync } = require("node:fs");
 const { join } = require("node:path");
 const test = require("node:test");
 
-const seedKnowledgeSource = () =>
-  readFileSync(join(process.cwd(), "scripts/seed-knowledge.ts"), "utf8");
+const vanaBotKnowledge = () =>
+  readFileSync(join(process.cwd(), "content/knowledge/projects/vana-bot.md"), "utf8");
 
-test("vana.bot seed knowledge uses shipped app framing without end-to-end language", () => {
-  const source = seedKnowledgeSource();
+test("vana.bot knowledge uses shipped app framing without end-to-end language", () => {
+  const source = vanaBotKnowledge();
 
   assert.match(
     source,
